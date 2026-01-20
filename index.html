@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="pt-MZ">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InvestMz - Oficial</title>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <style>
+        :root { --primary: #00b894; --dark-nav: #1a1c23; --bg: #f4f7f6; --accent: #0984e3; --gold: #f1c40f; --telegram: #0088cc; --red: #ff4757; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding-bottom: 90px; color: #2d3436; }
+        
+        /* Cabeçalho com Logo */
+        .header { background: white; padding: 15px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1001; }
+        .logo-box { display: flex; align-items: center; gap: 10px; }
+        .logo-icon { width: 35px; height: 35px; background: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px; box-shadow: 0 3px 6px rgba(0,184,148,0.3); }
+        .logo-text { font-size: 22px; font-weight: 800; color: #2d3436; letter-spacing: -1px; }
+        .logo-text span { color: var(--primary); }
+
+        .container { width: 100%; max-width: 400px; padding: 20px; margin: auto; box-sizing: border-box; }
+        .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 15px; }
+        
+        .btn-float-tg { position: fixed; bottom: 100px; right: 20px; background: var(--telegram); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 999; text-decoration: none; font-size: 22px; }
+
+        .bottom-nav { position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%); width: 95%; max-width: 400px; background: var(--dark-nav); height: 65px; border-radius: 32px; display: flex; justify-content: space-around; align-items: center; z-index: 1000; }
+        .nav-item { color: #888; text-decoration: none; font-size: 13px; text-align: center; cursor: pointer; flex: 1; }
+        .nav-item.active { color: white; font-weight: bold; }
+        
+        .btn { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 12px; width: 100%; font-weight: bold; cursor: pointer; font-size: 15px; margin-top: 10px; }
+        .btn-retirar { background: var(--accent); }
+        .btn-convidar { background: var(--gold); color: #2d3436; margin-top: 10px; }
+        
+        .plan-box { border: 1px solid #eee; padding: 15px; border-radius: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; background: #fff; cursor: pointer; }
+        #screens > div { display: none; }
+        #screens > .active { display: block; }
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
+        
+        .history-text { font-size: 0.95rem; line-height: 1.6; color: #444; text-align: justify; }
+        .info-box { font-size: 13px; padding: 12px; border-radius: 10px; margin-top: 10px; line-height: 1.4; }
+        .info-warning { background: #fff1f0; border-left: 4px solid var(--red); color: #cf1322; }
+    </style>
+</head>
+<body>
+
+<header class="header" id="header-main" style="display: none;">
+    <div class="logo-box">
+        <div class="logo-icon">M</div>
+        <div class="logo-text">Invest<span>Mz</span></div>
+    </div>
+</header>
+
+<a href="https://t.me/+258840474014" class="btn-float-tg" target="_blank">✈️</a>
+
+<div class="container" id="screens">
+
+    <div id="page-login" class="active">
+        <div class="card" style="text-align: center; margin-top: 40px;">
+            <div class="logo-icon" style="margin: 0 auto 15px; width: 60px; height: 60px; font-size: 30px;">M</div>
+            <h1 style="margin: 0; color: var(--primary);">InvestMz</h1>
+            <p style="color: gray; margin-bottom: 20px;">O seu futuro financeiro começa aqui</p>
+            <input type="email" id="login-email" placeholder="Email">
+            <input type="password" id="login-pass" placeholder="Senha">
+            <button class="btn" onclick="entrar()">Entrar / Registar</button>
+        </div>
+    </div>
+
+    <div id="page-lar">
+        <div class="card">
+            <h2 style="color: var(--primary); text-align: center;">Nossa Trajetória</h2>
+            <div class="history-text">
+                <p>A <b>InvestMz</b> não é apenas uma plataforma financeira; é o culminar de uma visão iniciada em 2021 por um grupo de jovens moçambicanos apaixonados por tecnologia e economia circular. Percebemos que o sistema financeiro tradicional muitas vezes excluía aqueles que queriam começar com pouco, mas possuíam grandes ambições.</p>
+                <p>O que começou como uma rede de apoio mútuo em Maputo, rapidamente expandiu-se. Hoje, operamos como uma ponte digital segura, utilizando sistemas de micro-investimento que permitem que cada Metical investido seja aplicado em projetos de rápido retorno no mercado local.</p>
+                <p>Nossa integridade é baseada na transparência total: cada transação via <b>M-Pesa</b> ou <b>E-mola</b> é verificada manualmente para garantir a segurança dos nossos utilizadores.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="page-vip">
+        <h2 style="padding-left: 10px;">Planos VIP</h2>
+        <div class="plan-box" onclick="tentarInvestir(500, 25)">
+            <div><b>VIP 1 - 500 MT</b><br><small>Ganhe 25 MT/dia</small></div>
+            <span style="color: var(--primary); font-weight: bold;">Investir</span>
+        </div>
+        <div class="plan-box" onclick="tentarInvestir(700, 35)">
+            <div><b>VIP 2 - 700 MT</b><br><small>Ganhe 35 MT/dia</small></div>
+            <span style="color: var(--primary); font-weight: bold;">Investir</span>
+        </div>
+        <div class="plan-box" onclick="tentarInvestir(1000, 50)">
+            <div><b>VIP 3 - 1000 MT</b><br><small>Ganhe 50 MT/dia</small></div>
+            <span style="color: var(--primary); font-weight: bold;">Investir</span>
+        </div>
+        <div class="plan-box" onclick="tentarInvestir(1500, 75)">
+            <div><b>VIP 4 - 1500 MT</b><br><small>Ganhe 75 MT/dia</small></div>
+            <span style="color: var(--primary); font-weight: bold;">Investir</span>
+        </div>
+    </div>
+
+    <div id="page-lucro">
+        <div class="card">
+            <h3>Meu Rendimento</h3>
+            <div id="lucro-info">A carregar...</div>
+        </div>
+    </div>
+
+    <div id="page-meu">
+        <div class="card" style="background: var(--dark-nav); color: white;">
+            <small>Saldo Disponível:</small>
+            <h1 id="user-balance" style="margin: 5px 0;">0.00 MT</h1>
+            <p id="user-email-txt" style="margin: 0; font-size: 14px; opacity: 0.8;">---</p>
+        </div>
+        
+        <div style="display: flex; gap: 10px;">
+            <button class="btn" onclick="navegar('page-recarregar')">Depositar</button>
+            <button class="btn btn-retirar" onclick="navegar('page-retirar')">Retirar</button>
+        </div>
+
+        <div class="card" style="margin-top: 15px;">
+            <h4 style="margin: 0; color: var(--gold);">💰 Convide Amigos</h4>
+            <p style="font-size: 13px;">Ganhe <b>60 MT</b> por cada amigo que depositar!</p>
+            <button class="btn btn-convidar" onclick="gerarLinkConvite()">Gerar Link</button>
+        </div>
+
+        <center><button onclick="sair()" style="margin-top: 20px; background:none; border:none; color:#ff4757; cursor:pointer;">Terminar Sessão</button></center>
+    </div>
+
+    <div id="page-recarregar">
+        <div class="card">
+            <h3>Recarregar via M-Pesa</h3>
+            <p>Envie para: <b>834788141</b></p>
+            <input type="number" id="deposito-valor" placeholder="Valor enviado (MT)">
+            <input type="text" id="deposito-id" placeholder="ID da Transação">
+            <button class="btn" onclick="enviarComprovativo()">Confirmar</button>
+            <button onclick="navegar('page-meu')" style="background:none; border:none; width:100%; margin-top:10px; color:gray;">Voltar</button>
+        </div>
+    </div>
+
+    <div id="page-retirar">
+        <div class="card">
+            <h3>Levantamento</h3>
+            <div class="info-box info-warning">
+                Mínimo: <b>100 MT</b> | Taxa: <b>10 MT</b>
+            </div>
+            <input type="number" id="saque-valor" placeholder="Valor MT">
+            <input type="number" id="saque-numero" placeholder="Número M-Pesa">
+            <button class="btn btn-retirar" onclick="solicitarSaque()">Confirmar</button>
+            <button onclick="navegar('page-meu')" style="background:none; border:none; width:100%; margin-top:10px; color:gray;">Voltar</button>
+        </div>
+    </div>
+
+</div>
+
+<nav class="bottom-nav" id="main-nav" style="display: none;">
+    <div class="nav-item active" onclick="navegar('page-lar', this)">Lar</div>
+    <div class="nav-item" onclick="navegar('page-vip', this)">VIP</div>
+    <div class="nav-item" onclick="navegar('page-lucro', this)">Lucro</div>
+    <div class="nav-item" onclick="navegar('page-meu', this)">Meu</div>
+</nav>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyCeEWLKc1iE80dFaSy1pRvI-AP_p8pwUV8",
+        authDomain: "investimento-6e9a8.firebaseapp.com",
+        projectId: "investimento-6e9a8",
+        storageBucket: "investimento-6e9a8.firebasestorage.app",
+        messagingSenderId: "219741270350",
+        appId: "1:219741270350:web:554c4de7dd49c2750aee1f"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    let SALDO_ATUAL = 0;
+
+    function navegar(id, el) {
+        document.querySelectorAll('#screens > div').forEach(d => d.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        if(el) {
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
+        }
+    }
+
+    function entrar() {
+        const e = document.getElementById('login-email').value;
+        const p = document.getElementById('login-pass').value;
+        if(!e || !p) return alert("Preencha os campos!");
+        auth.signInWithEmailAndPassword(e, p).catch(() => auth.createUserWithEmailAndPassword(e, p));
+    }
+
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            document.getElementById('main-nav').style.display = 'flex';
+            document.getElementById('header-main').style.display = 'flex';
+            document.getElementById('user-email-txt').innerText = user.email;
+            ouvirDados(user.uid);
+            navegar('page-lar');
+        } else {
+            document.getElementById('main-nav').style.display = 'none';
+            document.getElementById('header-main').style.display = 'none';
+            navegar('page-login');
+        }
+    });
+
+    function solicitarSaque() {
+        const v = parseFloat(document.getElementById('saque-valor').value);
+        if (v < 100) return alert("Mínimo de 100 MT.");
+        if (v > SALDO_ATUAL) return alert("Saldo insuficiente.");
+        db.collection("solicitacoes_saque").add({
+            uid: auth.currentUser.uid, valor: v, status: "Pendente", data: new Date().getTime()
+        }).then(() => { alert("Pedido enviado!"); navegar('page-meu'); });
+    }
+
+    function tentarInvestir(custo, ganho) {
+        if (SALDO_ATUAL < custo) {
+            alert("Saldo insuficiente, por favor recarrega a tua conta.");
+            navegar('page-meu');
+            return;
+        }
+        if(confirm(`Ativar VIP?`)) {
+            const novoSaldo = SALDO_ATUAL - custo;
+            db.collection("usuarios").doc(auth.currentUser.uid).update({ saldo: novoSaldo });
+            db.collection("investimentos_ativos").doc(auth.currentUser.uid).set({
+                plano: custo, ganhoDiario: ganho, data: new Date().getTime()
+            }).then(() => alert("VIP Ativado!"));
+        }
+    }
+
+    function gerarLinkConvite() {
+        const link = window.location.origin + "?ref=" + auth.currentUser.uid.substring(0,6);
+        alert("Copiado: " + link);
+    }
+
+    function enviarComprovativo() {
+        const v = document.getElementById('deposito-valor').value;
+        const tid = document.getElementById('deposito-id').value;
+        db.collection("depositos_pendentes").add({
+            uid: auth.currentUser.uid, valor: parseFloat(v), transacao: tid, data: new Date().getTime()
+        }).then(() => { alert("Enviado!"); navegar('page-meu'); });
+    }
+
+    function ouvirDados(uid) {
+        db.collection("usuarios").doc(uid).onSnapshot(doc => {
+            SALDO_ATUAL = doc.exists ? (doc.data().saldo || 0) : 0;
+            document.getElementById('user-balance').innerText = SALDO_ATUAL.toFixed(2) + " MT";
+            if(!doc.exists) db.collection("usuarios").doc(uid).set({ saldo: 0 });
+        });
+        db.collection("investimentos_ativos").doc(uid).onSnapshot(doc => {
+            document.getElementById('lucro-info').innerHTML = doc.exists ? 
+                `<b style="color:green">VIP ${doc.data().plano} MT Ativo</b><br>Ganhando ${doc.data().ganhoDiario} MT/dia` : 
+                "Nenhum plano ativo.";
+        });
+    }
+
+    function sair() { auth.signOut(); }
+</script>
+</body>
+</html>
