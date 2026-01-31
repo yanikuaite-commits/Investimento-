@@ -127,8 +127,8 @@
 
     <div id="page-recarregar">
         <div class="card">
-            <h3>Recarregar via M-Pesa</h3>
-            <p>Envie para: <b>834788141</b></p>
+            <h3>Recarregar via E-mola</h3>
+            <p>Envie para: <b>865672009</b></p>
             <input type="number" id="deposito-valor" placeholder="Valor enviado (MT)">
             <input type="text" id="deposito-id" placeholder="ID da Transação">
             <button class="btn" onclick="enviarComprovativo()">Confirmar</button>
@@ -143,7 +143,7 @@
                 Mínimo: <b>100 MT</b> | Taxa: <b>10 MT</b>
             </div>
             <input type="number" id="saque-valor" placeholder="Valor MT">
-            <input type="number" id="saque-numero" placeholder="Número M-Pesa">
+            <input type="number" id="saque-numero" placeholder="Número M-Pesa / E-mola">
             <button class="btn btn-retirar" onclick="solicitarSaque()">Confirmar</button>
             <button onclick="navegar('page-meu')" style="background:none; border:none; width:100%; margin-top:10px; color:gray;">Voltar</button>
         </div>
@@ -256,4 +256,6 @@
     function sair() { auth.signOut(); }
 </script>
 </body>
-</html>
+            </html>
+
+
