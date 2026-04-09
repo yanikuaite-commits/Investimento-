@@ -12,12 +12,13 @@
         :root { --primary: #00b894; --dark-nav: #1a1c23; --bg: #f4f7f6; --accent: #0984e3; --gold: #f1c40f; --telegram: #0088cc; --red: #ff4757; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding-bottom: 90px; color: #2d3436; }
         
-        /* Cabeçalho com Logo */
-        .header { background: white; padding: 15px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1001; }
+        .header { background: white; padding: 15px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1001; }
         .logo-box { display: flex; align-items: center; gap: 10px; }
         .logo-icon { width: 35px; height: 35px; background: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px; box-shadow: 0 3px 6px rgba(0,184,148,0.3); }
         .logo-text { font-size: 22px; font-weight: 800; color: #2d3436; letter-spacing: -1px; }
         .logo-text span { color: var(--primary); }
+        .notification-bell { position: relative; cursor: pointer; font-size: 24px; margin-right: 5px; }
+        .badge { position: absolute; top: -5px; right: -5px; background: var(--red); color: white; border-radius: 50%; padding: 2px 6px; font-size: 11px; font-weight: bold; }
 
         .container { width: 100%; max-width: 400px; padding: 20px; margin: auto; box-sizing: border-box; }
         .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 15px; }
@@ -32,7 +33,9 @@
         .btn-retirar { background: var(--accent); }
         .btn-convidar { background: var(--gold); color: #2d3436; margin-top: 10px; }
         
-        .plan-box { border: 1px solid #eee; padding: 15px; border-radius: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; background: #fff; cursor: pointer; }
+        .plan-box { border: 1px solid #eee; padding: 15px; border-radius: 15px; margin-bottom: 12px; display: flex; flex-direction: column; background: #fff; cursor: pointer; }
+        .plan-header { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        .plan-details { font-size: 0.8rem; color: #666; margin-top: 6px; line-height: 1.4; border-top: 1px dashed #ddd; padding-top: 6px; }
         #screens > div { display: none; }
         #screens > .active { display: block; }
         input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
@@ -40,6 +43,25 @@
         .history-text { font-size: 0.95rem; line-height: 1.6; color: #444; text-align: justify; }
         .info-box { font-size: 13px; padding: 12px; border-radius: 10px; margin-top: 10px; line-height: 1.4; }
         .info-warning { background: #fff1f0; border-left: 4px solid var(--red); color: #cf1322; }
+
+        /* Notificações Modal */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; display: none; justify-content: center; align-items: center; }
+        .modal-content { background: white; width: 90%; max-width: 400px; border-radius: 20px; padding: 20px; max-height: 70vh; overflow-y: auto; }
+        .notification-item { padding: 12px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .status-pending { color: #f39c12; }
+        .status-confirmed { color: #27ae60; }
+        .status-rejected { color: var(--red); }
+
+        /* Histórico */
+        .history-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
+        .history-amount { font-weight: bold; }
+        .history-positive { color: #27ae60; }
+        .history-negative { color: var(--red); }
+        .history-pending { color: #f39c12; }
+
+        /* Tooltip */
+        .info-tooltip { background: #f8f9fa; border-radius: 8px; padding: 10px; font-size: 12px; margin: 5px 0; display: none; border-left: 3px solid var(--accent); }
+        .info-link { color: var(--accent); text-decoration: underline; cursor: pointer; font-size: 13px; }
     </style>
 </head>
 <body>
@@ -49,12 +71,24 @@
         <div class="logo-icon">M</div>
         <div class="logo-text">Invest<span>Mz</span></div>
     </div>
+    <div class="notification-bell" onclick="abrirNotificacoes()">
+        🔔
+        <span class="badge" id="notif-badge" style="display: none;">0</span>
+    </div>
 </header>
+
+<!-- Modal de Notificações -->
+<div class="modal" id="notif-modal" onclick="if(event.target===this) fecharNotificacoes()">
+    <div class="modal-content">
+        <h3 style="margin-top:0;">Notificações</h3>
+        <div id="notif-list">Carregando...</div>
+        <button class="btn" onclick="fecharNotificacoes()" style="margin-top:15px;">Fechar</button>
+    </div>
+</div>
 
 <a href="https://t.me/+258840474014" class="btn-float-tg" target="_blank">✈️</a>
 
-<div class="container" id="screens">
-
+<div class="container" id="screens">    <!-- Tela de Login -->
     <div id="page-login" class="active">
         <div class="card" style="text-align: center; margin-top: 40px;">
             <div class="logo-icon" style="margin: 0 auto 15px; width: 60px; height: 60px; font-size: 30px;">M</div>
@@ -66,6 +100,7 @@
         </div>
     </div>
 
+    <!-- Tela Lar -->
     <div id="page-lar">
         <div class="card">
             <h2 style="color: var(--primary); text-align: center;">Nossa Trajetória</h2>
@@ -77,26 +112,64 @@
         </div>
     </div>
 
+    <!-- Tela VIP -->
     <div id="page-vip">
         <h2 style="padding-left: 10px;">Planos VIP</h2>
+        
         <div class="plan-box" onclick="tentarInvestir(500, 25)">
-            <div><b>VIP 1 - 500 MT</b><br><small>Ganhe 25 MT/dia</small></div>
-            <span style="color: var(--primary); font-weight: bold;">Investir</span>
+            <div class="plan-header">
+                <div><b>VIP 1 - 500 MT</b><br><small>Ganhe 25 MT/dia</small></div>
+                <span style="color: var(--primary); font-weight: bold;">Investir</span>
+            </div>
+            <div class="plan-details">
+                ⏱️ Duração: 30 dias<br>
+                💰 Lucro total: 750 MT (250 MT líquido)<br>
+                🔄 Retorno diário creditado automaticamente
+            </div>
         </div>
+        
         <div class="plan-box" onclick="tentarInvestir(700, 35)">
-            <div><b>VIP 2 - 700 MT</b><br><small>Ganhe 35 MT/dia</small></div>
-            <span style="color: var(--primary); font-weight: bold;">Investir</span>
+            <div class="plan-header">
+                <div><b>VIP 2 - 700 MT</b><br><small>Ganhe 35 MT/dia</small></div>
+                <span style="color: var(--primary); font-weight: bold;">Investir</span>
+            </div>
+            <div class="plan-details">
+                ⏱️ Duração: 30 dias<br>
+                💰 Lucro total: 1.050 MT (350 MT líquido)<br>
+                🔄 Retorno diário creditado automaticamente
+            </div>
         </div>
+        
         <div class="plan-box" onclick="tentarInvestir(1000, 50)">
-            <div><b>VIP 3 - 1000 MT</b><br><small>Ganhe 50 MT/dia</small></div>
-            <span style="color: var(--primary); font-weight: bold;">Investir</span>
+            <div class="plan-header">
+                <div><b>VIP 3 - 1.000 MT</b><br><small>Ganhe 50 MT/dia</small></div>
+                <span style="color: var(--primary); font-weight: bold;">Investir</span>
+            </div>
+            <div class="plan-details">
+                ⏱️ Duração: 30 dias<br>
+                💰 Lucro total: 1.500 MT (500 MT líquido)<br>
+                🔄 Retorno diário creditado automaticamente
+            </div>
         </div>
+        
         <div class="plan-box" onclick="tentarInvestir(1500, 75)">
-            <div><b>VIP 4 - 1500 MT</b><br><small>Ganhe 75 MT/dia</small></div>
-            <span style="color: var(--primary); font-weight: bold;">Investir</span>
+            <div class="plan-header">
+                <div><b>VIP 4 - 1.500 MT</b><br><small>Ganhe 75 MT/dia</small></div>
+                <span style="color: var(--primary); font-weight: bold;">Investir</span>
+            </div>
+            <div class="plan-details">
+                ⏱️ Duração: 30 dias<br>
+                💰 Lucro total: 2.250 MT (750 MT líquido)<br>
+                🔄 Retorno diário creditado automaticamente
+            </div>
         </div>
+        
+        <p style="font-size: 12px; color: #888; margin-top: 5px; padding-left: 10px;">
+            ⚡ Todos os planos têm validade de 30 dias. O valor investido é devolvido ao final do período.
+        </p>
     </div>
 
+    <!-- Tela Lucro -->
     <div id="page-lucro">
         <div class="card">
             <h3>Meu Rendimento</h3>
@@ -104,6 +177,7 @@
         </div>
     </div>
 
+    <!-- Tela Meu -->
     <div id="page-meu">
         <div class="card" style="background: var(--dark-nav); color: white;">
             <small>Saldo Disponível:</small>
@@ -116,6 +190,12 @@
             <button class="btn btn-retirar" onclick="navegar('page-retirar')">Retirar</button>
         </div>
 
+        <!-- Histórico de transações -->
+        <div class="card" style="margin-top: 15px;">
+            <h4 style="margin: 0 0 10px 0;">📋 Histórico Recente</h4>
+            <div id="historico-list">Carregando...</div>
+        </div>
+
         <div class="card" style="margin-top: 15px;">
             <h4 style="margin: 0; color: var(--gold);">💰 Convide Amigos</h4>
             <p style="font-size: 13px;">Ganhe <b>60 MT</b> por cada amigo que depositar!</p>
@@ -125,17 +205,32 @@
         <center><button onclick="sair()" style="margin-top: 20px; background:none; border:none; color:#ff4757; cursor:pointer;">Terminar Sessão</button></center>
     </div>
 
+    <!-- Tela Recarregar -->
     <div id="page-recarregar">
         <div class="card">
             <h3>Recarregar via E-mola</h3>
-            <p>Envie para: <b>865672009</b></p>
+            <p>Envie para: <b>861610606</b></p>
             <input type="number" id="deposito-valor" placeholder="Valor enviado (MT)">
             <input type="text" id="deposito-id" placeholder="ID da Transação">
-            <button class="btn" onclick="enviarComprovativo()">Confirmar</button>
+            
+            <!-- Explicação do ID da transação -->
+            <div style="margin: 10px 0;">
+                <span class="info-link" onclick="toggleIdInfo()">ℹ️ Onde encontro o ID da transação?</span>
+                <div id="id-info-tooltip" class="info-tooltip">
+                    <b>Passo a passo:</b><br>
+                    1️⃣ Após enviar o dinheiro via E-mola, receberá uma mensagem SMS de confirmação.<br>
+                    2️⃣ O ID da transação é o código alfanumérico que aparece na mensagem (ex: <b>FT123456789</b>).<br>
+                    3️⃣ Copie esse código e cole no campo acima.<br>
+                    📌 Se não recebeu SMS, verifique no menu "Extrato" do seu aplicativo E-mola/M-Pesa.
+                </div>
+            </div>
+
+            <button class="btn" onclick="enviarComprovativo()">Confirmar Depósito</button>
             <button onclick="navegar('page-meu')" style="background:none; border:none; width:100%; margin-top:10px; color:gray;">Voltar</button>
         </div>
     </div>
 
+    <!-- Tela Retirar -->
     <div id="page-retirar">
         <div class="card">
             <h3>Levantamento</h3>
@@ -144,13 +239,14 @@
             </div>
             <input type="number" id="saque-valor" placeholder="Valor MT">
             <input type="number" id="saque-numero" placeholder="Número M-Pesa / E-mola">
-            <button class="btn btn-retirar" onclick="solicitarSaque()">Confirmar</button>
+            <button class="btn btn-retirar" onclick="solicitarSaque()">Confirmar Saque</button>
             <button onclick="navegar('page-meu')" style="background:none; border:none; width:100%; margin-top:10px; color:gray;">Voltar</button>
         </div>
     </div>
 
 </div>
 
+<!-- Navegação inferior -->
 <nav class="bottom-nav" id="main-nav" style="display: none;">
     <div class="nav-item active" onclick="navegar('page-lar', this)">Lar</div>
     <div class="nav-item" onclick="navegar('page-vip', this)">VIP</div>
@@ -159,6 +255,7 @@
 </nav>
 
 <script>
+    // Configuração Firebase
     const firebaseConfig = {
         apiKey: "AIzaSyCeEWLKc1iE80dFaSy1pRvI-AP_p8pwUV8",
         authDomain: "investimento-6e9a8.firebaseapp.com",
@@ -172,7 +269,10 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
     let SALDO_ATUAL = 0;
+    let currentUser = null;
+    let unsubscribeNotif = null;
 
+    // Funções de navegação e UI
     function navegar(id, el) {
         document.querySelectorAll('#screens > div').forEach(d => d.classList.remove('active'));
         document.getElementById(id).classList.add('active');
@@ -180,8 +280,23 @@
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             el.classList.add('active');
         }
+        if (id === 'page-meu') carregarHistorico();
     }
 
+    function toggleIdInfo() {
+        const tooltip = document.getElementById('id-info-tooltip');
+        tooltip.style.display = tooltip.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function abrirNotificacoes() {
+        document.getElementById('notif-modal').style.display = 'flex';
+        carregarNotificacoes();
+    }
+    function fecharNotificacoes() {
+        document.getElementById('notif-modal').style.display = 'none';
+    }
+
+    // Autenticação
     function entrar() {
         const e = document.getElementById('login-email').value;
         const p = document.getElementById('login-pass').value;
@@ -191,55 +306,23 @@
 
     auth.onAuthStateChanged(user => {
         if (user) {
+            currentUser = user;
             document.getElementById('main-nav').style.display = 'flex';
             document.getElementById('header-main').style.display = 'flex';
             document.getElementById('user-email-txt').innerText = user.email;
             ouvirDados(user.uid);
+            escutarNotificacoes(user.uid);
             navegar('page-lar');
         } else {
+            currentUser = null;
             document.getElementById('main-nav').style.display = 'none';
             document.getElementById('header-main').style.display = 'none';
+            if (unsubscribeNotif) unsubscribeNotif();
             navegar('page-login');
         }
     });
 
-    function solicitarSaque() {
-        const v = parseFloat(document.getElementById('saque-valor').value);
-        if (v < 100) return alert("Mínimo de 100 MT.");
-        if (v > SALDO_ATUAL) return alert("Saldo insuficiente.");
-        db.collection("solicitacoes_saque").add({
-            uid: auth.currentUser.uid, valor: v, status: "Pendente", data: new Date().getTime()
-        }).then(() => { alert("Pedido enviado!"); navegar('page-meu'); });
-    }
-
-    function tentarInvestir(custo, ganho) {
-        if (SALDO_ATUAL < custo) {
-            alert("Saldo insuficiente, por favor recarrega a tua conta.");
-            navegar('page-meu');
-            return;
-        }
-        if(confirm(`Ativar VIP?`)) {
-            const novoSaldo = SALDO_ATUAL - custo;
-            db.collection("usuarios").doc(auth.currentUser.uid).update({ saldo: novoSaldo });
-            db.collection("investimentos_ativos").doc(auth.currentUser.uid).set({
-                plano: custo, ganhoDiario: ganho, data: new Date().getTime()
-            }).then(() => alert("VIP Ativado!"));
-        }
-    }
-
-    function gerarLinkConvite() {
-        const link = window.location.origin + "?ref=" + auth.currentUser.uid.substring(0,6);
-        alert("Copiado: " + link);
-    }
-
-    function enviarComprovativo() {
-        const v = document.getElementById('deposito-valor').value;
-        const tid = document.getElementById('deposito-id').value;
-        db.collection("depositos_pendentes").add({
-            uid: auth.currentUser.uid, valor: parseFloat(v), transacao: tid, data: new Date().getTime()
-        }).then(() => { alert("Enviado!"); navegar('page-meu'); });
-    }
-
+    // Dados do usuário
     function ouvirDados(uid) {
         db.collection("usuarios").doc(uid).onSnapshot(doc => {
             SALDO_ATUAL = doc.exists ? (doc.data().saldo || 0) : 0;
@@ -253,9 +336,185 @@
         });
     }
 
+    // Notificações (central)
+    function escutarNotificacoes(uid) {
+        if (unsubscribeNotif) unsubscribeNotif();
+        const q = db.collection("depositos_pendentes").where("uid", "==", uid);
+        unsubscribeNotif = q.onSnapshot(() => {
+            atualizarBadgeNotificacoes(uid);
+        });
+    }
+
+    async function atualizarBadgeNotificacoes(uid) {
+        const snap = await db.collection("depositos_pendentes").where("uid", "==", uid).get();
+        let count = 0;
+        snap.forEach(doc => {
+            if (doc.data().status === 'pendente' || !doc.data().status) count++;
+        });
+        const badge = document.getElementById('notif-badge');
+        badge.innerText = count;
+        badge.style.display = count > 0 ? 'block' : 'none';
+    }
+
+    async function carregarNotificacoes() {
+        if (!currentUser) return;
+        const listDiv = document.getElementById('notif-list');
+        listDiv.innerHTML = 'Carregando...';
+        const uid = currentUser.uid;
+        
+        const depositosSnap = await db.collection("depositos_pendentes").where("uid", "==", uid).orderBy("data", "desc").limit(10).get();
+        const saquesSnap = await db.collection("solicitacoes_saque").where("uid", "==", uid).orderBy("data", "desc").limit(5).get();
+        
+        let html = '';
+        
+        depositosSnap.forEach(doc => {
+            const d = doc.data();
+            const status = d.status || 'pendente';
+            const statusClass = status === 'confirmado' ? 'status-confirmed' : (status === 'rejeitado' ? 'status-rejected' : 'status-pending');
+            const statusText = status === 'confirmado' ? '✅ Confirmado' : (status === 'rejeitado' ? '❌ Rejeitado' : '⏳ Pendente');
+            html += `<div class="notification-item">
+                <div><b>Depósito ${d.valor} MT</b><br><small>ID: ${d.transacao || '---'}</small></div>
+                <span class="${statusClass}">${statusText}</span>
+            </div>`;
+        });
+        
+        saquesSnap.forEach(doc => {
+            const d = doc.data();
+            const status = d.status || 'Pendente';
+            const statusClass = status === 'Concluído' ? 'status-confirmed' : (status === 'Rejeitado' ? 'status-rejected' : 'status-pending');
+            html += `<div class="notification-item">
+                <div><b>Saque ${d.valor} MT</b><br><small>${d.numero || ''}</small></div>
+                <span class="${statusClass}">${status}</span>
+            </div>`;
+        });
+        
+        if (html === '') html = '<p style="text-align:center;">Nenhuma notificação.</p>';
+        listDiv.innerHTML = html;
+    }
+
+    // Histórico na tela Meu
+    async function carregarHistorico() {
+        if (!currentUser) return;
+        const uid = currentUser.uid;
+        const histDiv = document.getElementById('historico-list');
+        histDiv.innerHTML = 'Carregando...';
+        
+        const depSnap = await db.collection("depositos_pendentes").where("uid", "==", uid).orderBy("data", "desc").limit(5).get();
+        const saqSnap = await db.collection("solicitacoes_saque").where("uid", "==", uid).orderBy("data", "desc").limit(5).get();
+        const invSnap = await db.collection("investimentos_ativos").doc(uid).get();
+        
+        let transacoes = [];
+        
+        depSnap.forEach(doc => {
+            const d = doc.data();
+            transacoes.push({
+                tipo: 'deposito',
+                valor: d.valor,
+                data: d.data,
+                status: d.status || 'pendente',
+                id: d.transacao
+            });
+        });
+        
+        saqSnap.forEach(doc => {
+            const d = doc.data();
+            transacoes.push({
+                tipo: 'saque',
+                valor: -d.valor,
+                data: d.data,
+                status: d.status || 'Pendente',
+                numero: d.numero
+            });
+        });
+        
+        if (invSnap.exists) {
+            const inv = invSnap.data();
+            transacoes.push({
+                tipo: 'investimento',
+                valor: -inv.plano,
+                data: inv.data,
+                status: 'Ativo',
+                plano: inv.plano
+            });
+        }
+        
+        transacoes.sort((a,b) => b.data - a.data);
+        transacoes = transacoes.slice(0, 10);
+        
+        let html = '';
+        transacoes.forEach(t => {
+            const data = new Date(t.data).toLocaleDateString('pt-MZ');
+            const valorFormat = Math.abs(t.valor).toFixed(2);
+            const classeValor = t.valor >= 0 ? 'history-positive' : 'history-negative';
+            const statusClass = (t.status === 'confirmado' || t.status === 'Concluído') ? '✅' : (t.status === 'rejeitado' ? '❌' : '⏳');
+            
+            if (t.tipo === 'deposito') {
+                html += `<div class="history-item">
+                    <div>Depósito ${data}<br><small>ID: ${t.id || ''}</small></div>
+                    <div class="history-amount ${classeValor}">+${valorFormat} MT ${statusClass}</div>
+                </div>`;
+            } else if (t.tipo === 'saque') {
+                html += `<div class="history-item">
+                    <div>Saque ${data}<br><small>Nº: ${t.numero || ''}</small></div>
+                    <div class="history-amount ${classeValor}">-${valorFormat} MT ${statusClass}</div>
+                </div>`;
+            } else if (t.tipo === 'investimento') {
+                html += `<div class="history-item">
+                    <div>Invest. VIP ${t.plano} MT<br><small>${data}</small></div>
+                    <div class="history-amount history-negative">-${valorFormat} MT</div>
+                </div>`;
+            }
+        });
+        
+        if (html === '') html = '<p style="color:#888;">Nenhuma transação recente.</p>';
+        histDiv.innerHTML = html;
+    }
+
+    // Ações
+    function solicitarSaque() {
+        const v = parseFloat(document.getElementById('saque-valor').value);
+        const numero = document.getElementById('saque-numero').value;
+        if (v < 100) return alert("Mínimo de 100 MT.");
+        if (v > SALDO_ATUAL) return alert("Saldo insuficiente.");
+        if (!numero) return alert("Informe o número.");
+        db.collection("solicitacoes_saque").add({
+            uid: currentUser.uid, valor: v, numero: numero, status: "Pendente", data: new Date().getTime()
+        }).then(() => { alert("Pedido enviado!"); navegar('page-meu'); });
+    }
+
+    function tentarInvestir(custo, ganho) {
+        if (SALDO_ATUAL < custo) {
+            alert("Saldo insuficiente, por favor recarrega a tua conta.");
+            navegar('page-meu');
+            return;
+        }
+        if(confirm(`Ativar VIP?`)) {
+            const novoSaldo = SALDO_ATUAL - custo;
+            db.collection("usuarios").doc(currentUser.uid).update({ saldo: novoSaldo });
+            db.collection("investimentos_ativos").doc(currentUser.uid).set({
+                plano: custo, ganhoDiario: ganho, data: new Date().getTime()
+            }).then(() => alert("VIP Ativado!"));
+        }
+    }
+
+    function gerarLinkConvite() {
+        const link = window.location.origin + "?ref=" + currentUser.uid.substring(0,6);
+        alert("Copiado: " + link);
+    }
+
+    function enviarComprovativo() {
+        const v = document.getElementById('deposito-valor').value;
+        const tid = document.getElementById('deposito-id').value;
+        if (!v || !tid) return alert("Preencha valor e ID da transação.");
+        db.collection("depositos_pendentes").add({
+            uid: currentUser.uid, valor: parseFloat(v), transacao: tid, data: new Date().getTime(), status: "pendente"
+        }).then(() => { 
+            alert("Comprovativo enviado! Aguarde a confirmação."); 
+            navegar('page-meu'); 
+        });
+    }
+
     function sair() { auth.signOut(); }
 </script>
 </body>
-            </html>
-
-
+                </html>
