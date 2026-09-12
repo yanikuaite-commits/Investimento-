@@ -1,0 +1,1550 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>TruckInvest - Plataforma de Investimento</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+* { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+body { background: #000; color: #fff; }
+::-webkit-scrollbar { display: none; }
+
+.gradient-text { background: linear-gradient(135deg, #f59e0b, #fbbf24); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.btn-primary { background: linear-gradient(135deg, #f59e0b, #d97706); transition: all 0.3s; }
+.btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 25px rgba(245,158,11,0.4); }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.animate-fade { animation: fadeIn 0.4s ease; }
+@keyframes slideUp { from { opacity: 0; transform: translateY(100%); } to { opacity: 1; transform: translateY(0); } }
+.animate-slide-up { animation: slideUp 0.3s ease; }
+@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
+.shake { animation: shake 0.4s; }
+
+.app-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: #0a0a0a; }
+.landing-bg {
+  background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.95) 100%),
+              url('https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?w=1200&q=80') center/cover;
+}
+.profile-banner {
+  background: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.9) 100%),
+              url('https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?w=800&q=80') center/cover;
+  min-height: 220px;
+}
+
+.app-card { background: #111; border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; }
+.app-card-gold { background: linear-gradient(135deg, rgba(245,158,11,0.08), rgba(217,119,6,0.02)); border: 1px solid rgba(245,158,11,0.2); }
+
+.modal-overlay { background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); }
+.app-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 12px; padding: 14px 16px; width: 100%; font-size: 14px; }
+.app-input:focus { border-color: #f59e0b; outline: none; }
+
+.nav-tab { transition: all 0.3s; }
+.nav-tab.active { color: #f59e0b; }
+.nav-tab.active .tab-dot { background: #f59e0b; }
+.tab-dot { width: 4px; height: 4px; border-radius: 50%; background: transparent; margin: 4px auto 0; }
+
+.sub-tab { transition: all 0.3s; border-bottom: 2px solid transparent; }
+.sub-tab.active { color: #f59e0b; border-bottom-color: #f59e0b; }
+
+.progress-track { background: rgba(255,255,255,0.1); height: 6px; border-radius: 3px; overflow: hidden; }
+.progress-fill { background: linear-gradient(90deg, #f59e0b, #fbbf24); height: 100%; border-radius: 3px; transition: width 0.5s; }
+
+.otp-input { width: 44px; height: 52px; text-align: center; font-size: 22px; font-weight: bold; border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; background: rgba(255,255,255,0.05); color: #fff; }
+.otp-input:focus { border-color: #f59e0b; outline: none; }
+
+.bottom-nav { background: rgba(10,10,10,0.95); backdrop-filter: blur(20px); border-top: 1px solid rgba(255,255,255,0.06); }
+.bottom-nav-item { transition: all 0.2s; }
+.bottom-nav-item.active { color: #f59e0b; }
+
+.avatar-ring { background: linear-gradient(135deg, #f59e0b, #d97706); padding: 3px; border-radius: 50%; }
+.avatar-inner { background: #1a1a1a; border-radius: 50%; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+
+.badge-active { background: #10b981; color: #fff; }
+.badge-completed { background: #6b7280; color: #fff; }
+.badge-pending { background: #f59e0b; color: #000; }
+
+.toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 100; padding: 12px 20px; border-radius: 12px; font-size: 13px; animation: slideDown 0.3s; }
+@keyframes slideDown { from { opacity: 0; transform: translate(-50%, -20px); } to { opacity: 1; transform: translate(-50%, 0); } }
+.toast-success { background: #10b981; }
+.toast-error { background: #ef4444; }
+</style>
+</head>
+<body>
+
+<div class="app-container">
+
+<!-- LANDING PAGE -->
+<div id="landingPage" class="min-h-screen landing-bg flex flex-col items-center justify-center px-6">
+  <div class="text-center animate-fade">
+    <div class="flex items-center justify-center gap-2 mb-8">
+      <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center">
+        <i class="fas fa-truck text-white text-xl"></i>
+      </div>
+      <span class="text-3xl font-bold">Truck<span class="text-amber-500">Invest</span></span>
+    </div>
+    <div class="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 rounded-full px-4 py-1.5 mb-6">
+      <span class="w-2 h-2 rounded-full bg-amber-500 pulse-dot"></span>
+      <span class="text-xs text-amber-400 font-medium">Plataforma de Investimento</span>
+    </div>
+    <h1 class="text-4xl font-bold mb-4">Invista no <span class="gradient-text">futuro</span> do transporte</h1>
+    <p class="text-gray-400 mb-10 text-sm max-w-xs mx-auto">Plataforma exclusiva para investimentos no setor de transporte rodoviário.</p>
+    <button onclick="openAuthModal()" class="btn-primary text-black font-bold px-10 py-4 rounded-2xl text-base w-full max-w-xs">
+      <i class="fas fa-rocket mr-2"></i>Começar agora
+    </button>
+    <p class="text-[10px] text-gray-600 mt-8">© 2026 TruckInvest · Moçambique</p>
+  </div>
+</div>
+
+<!-- AUTH MODAL -->
+<div id="authModal" class="hidden fixed inset-0 z-50 modal-overlay flex items-end sm:items-center justify-center">
+  <div class="w-full max-w-md bg-[#0a0a0a] rounded-t-3xl sm:rounded-3xl animate-slide-up border-t sm:border border-white/10 max-h-[90vh] overflow-y-auto">
+    <div class="p-6">
+      <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center">
+            <i class="fas fa-truck text-white text-sm"></i>
+          </div>
+          <span class="font-bold">Truck<span class="text-amber-500">Invest</span></span>
+        </div>
+        <button onclick="closeAuthModal()" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center">
+          <i class="fas fa-times text-sm"></i>
+        </button>
+      </div>
+
+      <div class="flex bg-white/5 rounded-xl p-1 mb-6">
+        <button id="tabLogin" onclick="switchAuthTab('login')" class="flex-1 py-2.5 rounded-lg text-sm font-semibold bg-amber-500 text-black transition">Entrar</button>
+        <button id="tabRegister" onclick="switchAuthTab('register')" class="flex-1 py-2.5 rounded-lg text-sm font-semibold text-gray-400 transition">Criar conta</button>
+      </div>
+
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="mb-4">
+          <label class="block text-xs text-gray-400 mb-2">Número de telefone</label>
+          <div class="relative">
+            <i class="fas fa-phone absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm"></i>
+            <input type="tel" id="loginPhone" required pattern="[0-9]{9,12}" class="app-input pl-11" placeholder="841234567">
+          </div>
+        </div>
+        <div class="mb-4">
+          <label class="block text-xs text-gray-400 mb-2">Senha</label>
+          <div class="relative">
+            <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm"></i>
+            <input type="password" id="loginPassword" required minlength="6" class="app-input pl-11 pr-11" placeholder="••••••••">
+            <button type="button" onclick="togglePass('loginPassword', this)" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">
+              <i class="fas fa-eye text-sm"></i>
+            </button>
+          </div>
+        </div>
+        <div class="flex items-center justify-between mb-6">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" class="w-4 h-4 accent-amber-500 rounded">
+            <span class="text-xs text-gray-400">Lembrar-me</span>
+          </label>
+          <button type="button" onclick="showForgot()" class="text-xs text-amber-500">Esqueci a senha</button>
+        </div>
+        <button type="submit" class="btn-primary w-full text-black font-bold py-3.5 rounded-xl">Entrar</button>
+        <div id="loginError" class="hidden mt-3 bg-red-500/10 border border-red-500/30 text-red-300 text-xs p-3 rounded-lg"></div>
+      </form>
+
+      <form id="registerForm" class="hidden" onsubmit="handleRegister(event)">
+        <div class="mb-4">
+          <label class="block text-xs text-gray-400 mb-2">Nome completo</label>
+          <input type="text" id="regName" required minlength="3" class="app-input" placeholder="Seu nome">
+        </div>
+        <div class="mb-4">
+          <label class="block text-xs text-gray-400 mb-2">Número de telefone</label>
+          <div class="relative">
+            <i class="fas fa-phone absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm"></i>
+            <input type="tel" id="regPhone" required pattern="[0-9]{9,12}" class="app-input pl-11" placeholder="841234567">
+          </div>
+        </div>
+        <div class="mb-4">
+          <label class="block text-xs text-gray-400 mb-2">Senha</label>
+          <div class="relative">
+            <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm"></i>
+            <input type="password" id="regPassword" required minlength="6" class="app-input pl-11" placeholder="Mínimo 6 caracteres">
+          </div>
+        </div>
+        <div class="mb-4">
+          <label class="block text-xs text-gray-400 mb-2">Confirmar senha</label>
+          <input type="password" id="regPasswordConfirm" required class="app-input" placeholder="Repita a senha">
+        </div>
+        <div class="mb-6">
+          <label class="flex items-start gap-2 cursor-pointer">
+            <input type="checkbox" id="acceptTerms" required class="w-4 h-4 accent-amber-500 mt-0.5">
+            <span class="text-xs text-gray-400">Aceito os <span class="text-amber-500">termos</span> e a <span class="text-amber-500">política</span></span>
+          </label>
+        </div>
+        <button type="submit" class="btn-primary w-full text-black font-bold py-3.5 rounded-xl">Criar conta</button>
+        <div id="registerError" class="hidden mt-3 bg-red-500/10 border border-red-500/30 text-red-300 text-xs p-3 rounded-lg"></div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- FORGOT PASSWORD & OTP MODALS -->
+<div id="forgotModal" class="hidden fixed inset-0 z-50 modal-overlay flex items-center justify-center p-4">
+  <div class="w-full max-w-sm bg-[#0a0a0a] rounded-2xl animate-fade border border-white/10 p-6">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="text-lg font-bold">Recuperar senha</h3>
+      <button onclick="closeModal('forgotModal')" class="text-gray-400"><i class="fas fa-times"></i></button>
+    </div>
+    <form onsubmit="handleForgot(event)">
+      <div class="mb-4">
+        <label class="block text-xs text-gray-400 mb-2">Número de telefone</label>
+        <input type="tel" id="forgotPhone" required class="app-input" placeholder="841234567">
+      </div>
+      <button type="submit" class="btn-primary w-full text-black font-bold py-3 rounded-xl">Enviar código</button>
+    </form>
+  </div>
+</div>
+
+<div id="otpModal" class="hidden fixed inset-0 z-50 modal-overlay flex items-center justify-center p-4">
+  <div class="w-full max-w-sm bg-[#0a0a0a] rounded-2xl animate-fade border border-white/10 p-6">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="text-lg font-bold">Código de verificação</h3>
+      <button onclick="closeModal('otpModal')" class="text-gray-400"><i class="fas fa-times"></i></button>
+    </div>
+    <p class="text-xs text-gray-400 mb-4">Digite o código de 6 dígitos</p>
+    <div class="flex justify-center gap-2 mb-4">
+      <input type="text" maxlength="1" class="otp-input" oninput="otpNext(this, 0)" onkeydown="otpBack(event, this, 0)">
+      <input type="text" maxlength="1" class="otp-input" oninput="otpNext(this, 1)" onkeydown="otpBack(event, this, 1)">
+      <input type="text" maxlength="1" class="otp-input" oninput="otpNext(this, 2)" onkeydown="otpBack(event, this, 2)">
+      <input type="text" maxlength="1" class="otp-input" oninput="otpNext(this, 3)" onkeydown="otpBack(event, this, 3)">
+      <input type="text" maxlength="1" class="otp-input" oninput="otpNext(this, 4)" onkeydown="otpBack(event, this, 4)">
+      <input type="text" maxlength="1" class="otp-input" oninput="otpNext(this, 5)" onkeydown="otpBack(event, this, 5)">
+    </div>
+    <div id="otpError" class="hidden bg-red-500/10 border border-red-500/30 text-red-300 text-xs p-3 rounded-lg mb-4 text-center">Código incorreto</div>
+    <button onclick="verifyOtp()" class="btn-primary w-full text-black font-bold py-3 rounded-xl">Verificar</button>
+    <p class="text-center text-xs text-gray-400 mt-3">Não recebeu? <button onclick="resendOtp()" class="text-amber-500">Reenviar</button></p>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="mainApp" class="hidden">
+
+<header class="sticky top-0 z-40 bg-[#0a0a0a]/95 backdrop-blur-xl border-b border-white/5 px-4 py-3">
+  <div class="flex items-center justify-between">
+    <button class="text-white text-xl"><i class="fas fa-bars"></i></button>
+    <div class="flex items-center gap-2">
+      <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center">
+        <i class="fas fa-truck text-white text-sm"></i>
+      </div>
+      <span class="text-lg font-bold">Truck<span class="text-amber-500">Invest</span></span>
+    </div>
+    <div class="flex items-center gap-3">
+      <button onclick="showSection('admin')" class="text-amber-500 text-xs font-bold"><i class="fas fa-shield-alt mr-1"></i>ADMIN</button>
+      <button onclick="logout()" class="text-xs text-red-400">Sair</button>
+    </div>
+  </div>
+</header>
+
+<div class="pb-20">
+
+<!-- Profile Banner -->
+<div class="profile-banner px-4 pt-6 pb-8 relative">
+  <div class="flex items-end gap-4">
+    <div class="avatar-ring flex-shrink-0">
+      <div class="avatar-inner w-20 h-20">
+        <i class="fas fa-user text-3xl text-gray-400"></i>
+      </div>
+    </div>
+    <div class="flex-1 pb-1">
+      <span class="inline-block bg-amber-500 text-black text-[10px] font-bold px-2 py-0.5 rounded mb-1">Cliente</span>
+      <div class="text-xs text-gray-300 mb-0.5">ID : <span id="appUserId" class="text-amber-500 font-mono font-bold"></span></div>
+      <div class="text-lg font-bold text-white" id="appUserName">-</div>
+    </div>
+    <button onclick="openModal('editProfileModal')" class="bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs px-3 py-2 rounded-lg">
+      <i class="fas fa-pen text-[10px]"></i> Editar
+    </button>
+  </div>
+</div>
+
+<!-- Financial Card -->
+<div class="px-4 -mt-4 relative z-10">
+  <div class="app-card p-5">
+    <div class="grid grid-cols-2 gap-4 mb-5">
+      <div>
+        <div class="flex items-center gap-2 mb-2">
+          <i class="fas fa-wallet text-amber-500 text-xl"></i>
+          <span class="text-xs text-gray-400">Saldo atual</span>
+        </div>
+        <div class="text-2xl font-bold text-white" id="appBalance">MZN 0</div>
+      </div>
+      <div class="border-l border-white/10 pl-4">
+        <div class="flex items-center gap-2 mb-2">
+          <i class="fas fa-chart-line text-amber-500 text-xl"></i>
+          <span class="text-xs text-gray-400">Rendimento total</span>
+        </div>
+        <div class="text-2xl font-bold text-white" id="appYield">MZN 0.00</div>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 gap-3">
+      <button onclick="showSection('deposit')" class="btn-primary text-black font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 text-sm">
+        <i class="fas fa-arrow-down"></i> Depositar
+      </button>
+      <button onclick="showSection('withdraw')" class="bg-white/5 hover:bg-white/10 border border-white/20 text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 text-sm transition">
+        <i class="fas fa-arrow-up"></i> Levantar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Navigation Tabs -->
+<div class="px-4 mt-5">
+  <div class="grid grid-cols-4 gap-2">
+    <button onclick="switchMainTab('home')" class="nav-tab active app-card p-3 flex flex-col items-center gap-1.5">
+      <i class="fas fa-home text-xl"></i>
+      <span class="text-[10px] font-medium">Início</span>
+      <div class="tab-dot"></div>
+    </button>
+    <button onclick="switchMainTab('assets')" class="nav-tab app-card p-3 flex flex-col items-center gap-1.5 text-gray-400">
+      <i class="fas fa-coins text-xl"></i>
+      <span class="text-[10px] font-medium">Os meus ativos</span>
+      <div class="tab-dot"></div>
+    </button>
+    <button onclick="switchMainTab('share')" class="nav-tab app-card p-3 flex flex-col items-center gap-1.5 text-gray-400">
+      <i class="fas fa-share-alt text-xl"></i>
+      <span class="text-[10px] font-medium">Partilha</span>
+      <div class="tab-dot"></div>
+    </button>
+    <button onclick="switchMainTab('account')" class="nav-tab app-card p-3 flex flex-col items-center gap-1.5 text-gray-400">
+      <i class="fas fa-user text-xl"></i>
+      <span class="text-[10px] font-medium">Minha conta</span>
+      <div class="tab-dot"></div>
+    </button>
+  </div>
+</div>
+
+<!-- Tab Contents -->
+<div class="px-4 mt-5">
+<div id="tabHome" class="tab-content">
+  <div class="text-center py-12">
+    <i class="fas fa-home text-5xl text-gray-700 mb-4"></i>
+    <h3 class="text-lg font-bold mb-2">Bem-vindo de volta!</h3>
+    <p class="text-gray-400 text-xs mb-6">Acesse seus investimentos e acompanhe seu progresso.</p>
+    <button onclick="showSection('plans')" class="btn-primary text-black font-bold px-6 py-3 rounded-xl text-sm">
+      <i class="fas fa-chart-line mr-2"></i>Ver planos de investimento
+    </button>
+  </div>
+</div>
+
+<div id="tabAssets" class="tab-content hidden">
+  <h3 class="font-bold text-base mb-4">Os meus ativos</h3>
+  <div id="assetsList" class="space-y-3"></div>
+  <div id="noAssets" class="text-center py-10 text-gray-500">
+    <i class="fas fa-coins text-4xl mb-2 opacity-30"></i>
+    <p class="text-xs">Nenhum ativo ainda.</p>
+    <button onclick="showSection('plans')" class="btn-primary text-black text-xs font-bold px-4 py-2 rounded-lg mt-3">Investir agora</button>
+  </div>
+</div>
+
+<div id="tabShare" class="tab-content hidden">
+  <div class="text-center py-8">
+    <i class="fas fa-share-alt text-4xl text-amber-500 mb-4"></i>
+    <h3 class="text-lg font-bold mb-2">Partilha</h3>
+    <p class="text-gray-400 text-xs mb-6">Convide amigos e ganhe benefícios.</p>
+    <div class="app-card p-5">
+      <div class="text-xs text-gray-400 mb-3">Seu link de referência:</div>
+      <div class="bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-sm text-amber-500 font-mono break-all mb-4" id="refLink">truckinvest.co.mz/ref/</div>
+      <button onclick="copyRef()" class="btn-primary text-black font-bold px-6 py-2.5 rounded-lg text-sm w-full">Copiar link</button>
+    </div>
+  </div>
+</div>
+
+<div id="tabAccount" class="tab-content hidden">
+<div class="app-card p-5 mb-5">
+  <div class="flex items-center justify-between mb-4">
+    <div class="flex items-center gap-3">
+      <i class="fas fa-user-circle text-amber-500 text-2xl"></i>
+      <h3 class="text-base font-bold">Informações do perfil</h3>
+    </div>
+    <i class="fas fa-chevron-right text-gray-500 text-sm"></i>
+  </div>
+  <div class="space-y-0">
+    <div class="py-3 flex items-center justify-between border-b border-white/5">
+      <div class="flex items-center gap-3">
+        <i class="fas fa-user text-gray-500 w-5 text-sm"></i>
+        <span class="text-xs text-gray-400">Nome de usuário</span>
+      </div>
+      <span class="text-xs font-medium" id="infoName">-</span>
+    </div>
+    <div class="py-3 flex items-center justify-between border-b border-white/5">
+      <div class="flex items-center gap-3">
+        <i class="fas fa-id-card text-gray-500 w-5 text-sm"></i>
+        <span class="text-xs text-gray-400">ID de conta</span>
+      </div>
+      <span class="text-xs font-medium text-amber-500 font-mono" id="infoId">-</span>
+    </div>
+    <div class="py-3 flex items-center justify-between border-b border-white/5">
+      <div class="flex items-center gap-3">
+        <i class="fas fa-map-marker-alt text-gray-500 w-5 text-sm"></i>
+        <span class="text-xs text-gray-400">País</span>
+      </div>
+      <span class="text-xs font-medium">Moçambique</span>
+    </div>
+    <div class="py-3 flex items-center justify-between border-b border-white/5">
+      <div class="flex items-center gap-3">
+        <i class="fas fa-user-tag text-gray-500 w-5 text-sm"></i>
+        <span class="text-xs text-gray-400">Tipo de conta</span>
+      </div>
+      <span class="text-xs font-medium" id="infoType">Cliente</span>
+    </div>
+    <div class="py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <i class="fas fa-calendar-alt text-gray-500 w-5 text-sm"></i>
+        <span class="text-xs text-gray-400">Registo em</span>
+      </div>
+      <span class="text-xs font-medium" id="infoDate">-</span>
+    </div>
+  </div>
+</div>
+
+<div class="app-card p-4 mb-5">
+  <div class="flex overflow-x-auto scroll-hidden border-b border-white/5 pb-3 mb-4 -mx-1 px-1">
+    <button onclick="switchSubTab('history')" class="sub-tab active text-[11px] font-medium text-gray-400 whitespace-nowrap px-3 py-2 flex-shrink-0">
+      <i class="fas fa-list-alt mr-1"></i>Histórico
+    </button>
+    <button onclick="switchSubTab('wallet')" class="sub-tab text-[11px] font-medium text-gray-400 whitespace-nowrap px-3 py-2 flex-shrink-0">
+      <i class="fas fa-wallet mr-1"></i>Carteira
+    </button>
+    <button onclick="switchSubTab('security')" class="sub-tab text-[11px] font-medium text-gray-400 whitespace-nowrap px-3 py-2 flex-shrink-0">
+      <i class="fas fa-shield-alt mr-1"></i>Segurança
+    </button>
+    <button onclick="switchSubTab('support')" class="sub-tab text-[11px] font-medium text-gray-400 whitespace-nowrap px-3 py-2 flex-shrink-0">
+      <i class="fas fa-headset mr-1"></i>Suporte
+    </button>
+  </div>
+
+  <div id="subHistory" class="sub-content">
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <h4 class="font-bold text-sm flex items-center gap-2">
+          <i class="fas fa-chart-line text-amber-500"></i>
+          Meus investimentos
+        </h4>
+        <p class="text-[10px] text-gray-500 mt-0.5">Acompanhe todos os seus investimentos.</p>
+      </div>
+      <button onclick="showSection('plans')" class="text-[10px] text-amber-500 border border-amber-500/30 px-3 py-1.5 rounded-lg">Ver todos</button>
+    </div>
+    <div id="investmentsList" class="space-y-3"></div>
+    <div id="noInvestments" class="text-center py-8 text-gray-500">
+      <i class="fas fa-folder-open text-3xl mb-2 opacity-30"></i>
+      <p class="text-xs">Nenhum investimento ainda.</p>
+      <button onclick="showSection('plans')" class="btn-primary text-black text-xs font-bold px-4 py-2 rounded-lg mt-3">Investir agora</button>
+    </div>
+  </div>
+
+  <div id="subWallet" class="sub-content hidden">
+    <h4 class="font-bold text-sm mb-4 flex items-center gap-2"><i class="fas fa-wallet text-amber-500"></i>Carteira</h4>
+    <div class="app-card-gold rounded-xl p-4 mb-3 flex items-center justify-between">
+      <div>
+        <div class="text-[10px] text-gray-400">Saldo disponível</div>
+        <div class="text-xl font-bold text-amber-500" id="walletBalance">MZN 0</div>
+      </div>
+      <i class="fas fa-wallet text-gray-500 text-xl"></i>
+    </div>
+    <div class="grid grid-cols-2 gap-3 mb-4">
+      <button onclick="showSection('deposit')" class="btn-primary text-black font-bold py-3 rounded-xl text-xs"><i class="fas fa-arrow-down mr-1"></i>Depositar</button>
+      <button onclick="showSection('withdraw')" class="bg-white/5 border border-white/20 text-white font-bold py-3 rounded-xl text-xs"><i class="fas fa-arrow-up mr-1"></i>Levantar</button>
+    </div>
+    <div class="app-card rounded-xl p-4">
+      <div class="text-[10px] text-gray-400 mb-3">Últimas transações</div>
+      <div id="walletTx" class="space-y-2"></div>
+      <div id="noWalletTx" class="text-center py-4 text-gray-500 text-xs">Nenhuma transação recente.</div>
+    </div>
+  </div>
+
+  <div id="subSecurity" class="sub-content hidden">
+    <h4 class="font-bold text-sm mb-4 flex items-center gap-2"><i class="fas fa-shield-alt text-amber-500"></i>Segurança</h4>
+    <div class="space-y-2">
+      <div class="app-card rounded-xl p-4 flex items-center justify-between cursor-pointer" onclick="openModal('changePassModal')">
+        <div class="flex items-center gap-3">
+          <i class="fas fa-lock text-gray-400"></i>
+          <div><div class="text-xs font-medium">Alterar senha</div><div class="text-[10px] text-gray-500">Proteja sua conta</div></div>
+        </div>
+        <i class="fas fa-chevron-right text-gray-500 text-xs"></i>
+      </div>
+    </div>
+  </div>
+
+  <div id="subSupport" class="sub-content hidden">
+    <h4 class="font-bold text-sm mb-4 flex items-center gap-2"><i class="fas fa-headset text-amber-500"></i>Suporte</h4>
+    <div class="space-y-2">
+      <div class="app-card rounded-xl p-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <i class="fas fa-comments text-gray-400"></i>
+          <div><div class="text-xs font-medium">Chat ao vivo</div><div class="text-[10px] text-gray-500">Fale conosco</div></div>
+        </div>
+        <span class="text-[10px] text-green-400 bg-green-500/10 px-2 py-1 rounded">Online</span>
+      </div>
+      <div class="app-card rounded-xl p-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <i class="fas fa-envelope text-gray-400"></i>
+          <div><div class="text-xs font-medium">Email</div><div class="text-[10px] text-gray-500">contato@truckinvest.co.mz</div></div>
+        </div>
+        <i class="fas fa-chevron-right text-gray-500 text-xs"></i>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- Bottom Navigation -->
+<nav class="bottom-nav fixed bottom-0 left-0 right-0 z-40 pb-2 pt-2">
+  <div class="max-w-md mx-auto px-4">
+    <div class="flex justify-around">
+      <button onclick="switchMainTab('home')" class="bottom-nav-item active flex-1 py-2 text-center">
+        <i class="fas fa-home text-lg block mb-0.5"></i>
+        <span class="text-[10px]">Início</span>
+      </button>
+      <button onclick="switchMainTab('assets')" class="bottom-nav-item flex-1 py-2 text-center text-gray-500">
+        <i class="fas fa-coins text-lg block mb-0.5"></i>
+        <span class="text-[10px]">Os meus ativos</span>
+      </button>
+      <button onclick="switchMainTab('share')" class="bottom-nav-item flex-1 py-2 text-center text-gray-500">
+        <i class="fas fa-share-alt text-lg block mb-0.5"></i>
+        <span class="text-[10px]">Partilha</span>
+      </button>
+      <button onclick="switchMainTab('account')" class="bottom-nav-item flex-1 py-2 text-center text-gray-500">
+        <i class="fas fa-user text-lg block mb-0.5"></i>
+        <span class="text-[10px]">Minha conta</span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+</div>
+</div>
+
+<!-- PLANS PAGE -->
+<div id="plansPage" class="hidden min-h-screen bg-[#0a0a0a] pb-24">
+  <header class="sticky top-0 z-40 bg-[#0a0a0a]/95 backdrop-blur-xl border-b border-white/5 px-4 py-3">
+    <div class="flex items-center justify-between">
+      <button onclick="showSection('home')" class="text-white"><i class="fas fa-arrow-left"></i></button>
+      <span class="font-bold">Planos de Investimento</span>
+      <div class="w-6"></div>
+    </div>
+  </header>
+  <div class="px-4 py-6">
+    <div class="text-center mb-6">
+      <h2 class="text-2xl font-bold mb-2">Escolha seu <span class="gradient-text">Investimento</span></h2>
+      <p class="text-xs text-gray-400">Selecione o plano ideal para você.</p>
+    </div>
+    <div class="space-y-3" id="plansList"></div>
+  </div>
+</div>
+
+<!-- DEPOSIT PAGE -->
+<div id="depositPage" class="hidden min-h-screen bg-[#0a0a0a] pb-24">
+  <header class="sticky top-0 z-40 bg-[#0a0a0a]/95 backdrop-blur-xl border-b border-white/5 px-4 py-3">
+    <div class="flex items-center justify-between">
+      <button onclick="showSection('home')" class="text-white"><i class="fas fa-arrow-left"></i></button>
+      <span class="font-bold">Depósito</span>
+      <div class="w-6"></div>
+    </div>
+  </header>
+  <div class="px-4 py-6">
+    <div class="app-card p-5">
+      <div class="app-card-gold rounded-xl p-4 mb-5 flex items-center justify-between">
+        <span class="text-xs text-gray-400">Saldo disponível</span>
+        <span class="text-xl font-bold text-amber-500" id="depBalance">MZN 0</span>
+      </div>
+      
+      <div class="bg-gradient-to-br from-amber-500/10 to-amber-700/5 border border-amber-500/30 rounded-xl p-4 mb-5">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center">
+            <i class="fas fa-mobile-alt text-white text-xl"></i>
+          </div>
+          <div>
+            <h4 class="font-bold text-sm text-amber-500">M-Pesa</h4>
+            <p class="text-[10px] text-gray-400">Envie o valor para o número abaixo</p>
+          </div>
+        </div>
+        <div class="space-y-2">
+          <div class="flex items-center justify-between bg-black/30 rounded-lg p-3">
+            <div>
+              <div class="text-[10px] text-gray-400">Número</div>
+              <div class="text-base font-bold text-white font-mono">850446446</div>
+            </div>
+            <button onclick="copyToClipboard('850446446')" class="text-amber-500 hover:text-amber-400">
+              <i class="fas fa-copy"></i>
+            </button>
+          </div>
+          <div class="flex items-center justify-between bg-black/30 rounded-lg p-3">
+            <div>
+              <div class="text-[10px] text-gray-400">Nome</div>
+              <div class="text-sm font-bold text-white">Helton</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <form onsubmit="handleDeposit(event)">
+        <div class="mb-4">
+          <label class="block text-xs text-gray-400 mb-2">Valor (MZN)</label>
+          <input type="number" id="depAmount" min="100" required class="app-input" placeholder="Ex: 1000">
+        </div>
+        <div class="mb-4">
+          <label class="block text-xs text-gray-400 mb-2">Método</label>
+          <div class="app-input flex items-center gap-2 bg-white/5">
+            <i class="fas fa-mobile-alt text-red-500"></i>
+            <span class="text-sm">M-Pesa</span>
+          </div>
+          <input type="hidden" id="depMethod" value="mpesa">
+        </div>
+        <div class="mb-4">
+          <label class="block text-xs text-gray-400 mb-2">Mensagem de Confirmação M-Pesa</label>
+          <textarea id="depMessage" required rows="5" class="app-input" placeholder="Cole aqui a mensagem completa de confirmação do M-Pesa&#10;&#10;Exemplo:&#10;M-PESA&#10;Pagamento confirmado&#10;Valor: 1000.00&#10;Para: 850446446&#10;Ref: 9A8B7C6D5E&#10;Saldo: 5000.00"></textarea>
+          <p class="text-[10px] text-gray-500 mt-1"><i class="fas fa-info-circle mr-1"></i>Copie e cole a mensagem inteira que o M-Pesa envia</p>
+        </div>
+        <button type="submit" class="btn-primary w-full text-black font-bold py-3.5 rounded-xl">
+          <i class="fas fa-paper-plane mr-2"></i>Enviar solicitação
+        </button>
+      </form>
+      
+      <div class="mt-4 p-3 bg-amber-500/5 border border-amber-500/20 rounded-lg">
+        <div class="flex items-start gap-2">
+          <i class="fas fa-info-circle text-amber-500 text-sm mt-0.5"></i>
+          <div class="text-[10px] text-amber-300/80 leading-relaxed">
+            <strong>Como depositar:</strong><br>
+            1. Abra o M-Pesa (*150#)<br>
+            2. Envie para <strong>850446446</strong> (Helton)<br>
+            3. Copie a mensagem de confirmação<br>
+            4. Cole acima e envie<br>
+            5. Aguarde aprovação do admin
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WITHDRAW PAGE -->
+<div id="withdrawPage" class="hidden min-h-screen bg-[#0a0a0a] pb-24">
+  <header class="sticky top-0 z-40 bg-[#0a0a0a]/95 backdrop-blur-xl border-b border-white/5 px-4 py-3">
+    <div class="flex items-center justify-between">
+      <button onclick="showSection('home')" class="text-white"><i class="fas fa-arrow-left"></i></button>
+      <span class="font-bold">Levantamento</span>
+      <div class="w-6"></div>
+    </div>
+  </header>
+  <div class="px-4 py-6">
+    <div class="app-card p-5">
+      <div class="app-card-gold rounded-xl p-4 mb-5 flex items-center justify-between">
+        <span class="text-xs text-gray-400">Saldo disponível</span>
+        <span class="text-xl font-bold text-amber-500" id="wdBalance">MZN 0</span>
+      </div>
+      <form onsubmit="handleWithdraw(event)">
+        <div class="mb-4">
+          <label class="block text-xs text-gray-400 mb-2">Valor (MZN) <span class="text-amber-500">(Mínimo 100 MT)</span></label>
+          <input type="number" id="wdAmount" min="100" required class="app-input" placeholder="Ex: 500">
+        </div>
+        <div class="mb-4">
+          <label class="block text-xs text-gray-400 mb-2">Método</label>
+          <select id="wdMethod" required class="app-input">
+            <option value="">Selecione...</option>
+            <option value="mpesa">M-Pesa</option>
+            <option value="emola">e-Mola</option>
+            <option value="bank">Transferência</option>
+          </select>
+        </div>
+        <div class="mb-4">
+          <label class="block text-xs text-gray-400 mb-2">Número / Conta</label>
+          <input type="text" id="wdAccount" required class="app-input" placeholder="Ex: 841234567">
+        </div>
+        <div class="mb-4">
+          <label class="block text-xs text-gray-400 mb-2">Nome do titular</label>
+          <input type="text" id="wdName" required class="app-input" placeholder="Nome completo">
+        </div>
+        <button type="submit" class="btn-primary w-full text-black font-bold py-3.5 rounded-xl">Solicitar levantamento</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN PAGE -->
+<div id="adminPage" class="hidden min-h-screen bg-[#0a0a0a] pb-24">
+  <header class="sticky top-0 z-40 bg-[#0a0a0a]/95 backdrop-blur-xl border-b border-white/5 px-4 py-3">
+    <div class="flex items-center justify-between">
+      <button onclick="showSection('home')" class="text-white"><i class="fas fa-arrow-left"></i></button>
+      <span class="font-bold text-red-400"><i class="fas fa-shield-alt mr-2"></i>Painel Admin</span>
+      <button onclick="logout()" class="text-xs text-gray-400">Sair</button>
+    </div>
+  </header>
+  
+  <div class="px-4 py-6">
+    <div class="grid grid-cols-2 gap-3 mb-5">
+      <div class="app-card p-4">
+        <div class="text-[10px] text-gray-400 mb-1">Total Usuários</div>
+        <div class="text-xl font-bold text-white" id="adminTotalUsers">0</div>
+      </div>
+      <div class="app-card p-4">
+        <div class="text-[10px] text-gray-400 mb-1">Depósitos Pendentes</div>
+        <div class="text-xl font-bold text-amber-500" id="adminPendingDeposits">0</div>
+      </div>
+    </div>
+    
+    <div class="flex gap-2 mb-4 overflow-x-auto">
+      <button onclick="switchAdminTab('deposits')" class="admin-tab-btn active px-4 py-2 rounded-lg bg-amber-500 text-black text-xs font-bold whitespace-nowrap">
+        Depósitos
+      </button>
+      <button onclick="switchAdminTab('withdraws')" class="admin-tab-btn px-4 py-2 rounded-lg bg-white/5 text-gray-400 text-xs font-bold whitespace-nowrap">
+        Levantamentos
+      </button>
+      <button onclick="switchAdminTab('users')" class="admin-tab-btn px-4 py-2 rounded-lg bg-white/5 text-gray-400 text-xs font-bold whitespace-nowrap">
+        Usuários
+      </button>
+    </div>
+    
+    <div id="adminDepositsTab" class="admin-tab-content">
+      <h3 class="font-bold text-sm mb-3">Solicitações de Depósito</h3>
+      <div id="adminDepositsList" class="space-y-3"></div>
+      <div id="noAdminDeposits" class="text-center py-8 text-gray-500 text-xs">
+        <i class="fas fa-check-circle text-3xl mb-2 opacity-30"></i>
+        <p>Nenhuma solicitação pendente</p>
+      </div>
+    </div>
+    
+    <div id="adminWithdrawsTab" class="admin-tab-content hidden">
+      <h3 class="font-bold text-sm mb-3">Solicitações de Levantamento</h3>
+      <div id="adminWithdrawsList" class="space-y-3"></div>
+      <div id="noAdminWithdraws" class="text-center py-8 text-gray-500 text-xs">
+        <p>Nenhuma solicitação pendente</p>
+      </div>
+    </div>
+    
+    <div id="adminUsersTab" class="admin-tab-content hidden">
+      <h3 class="font-bold text-sm mb-3">Todos os Usuários</h3>
+      <div id="adminUsersList" class="space-y-2"></div>
+    </div>
+  </div>
+</div>
+
+<!-- INVEST MODAL -->
+<div id="investModal" class="hidden fixed inset-0 z-50 modal-overlay flex items-center justify-center p-4">
+  <div class="w-full max-w-sm bg-[#0a0a0a] rounded-2xl animate-fade border border-white/10 p-6">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="text-lg font-bold">Confirmar Investimento</h3>
+      <button onclick="closeModal('investModal')" class="text-gray-400"><i class="fas fa-times"></i></button>
+    </div>
+    <div id="investContent"></div>
+  </div>
+</div>
+
+<!-- EDIT PROFILE & CHANGE PASSWORD MODALS -->
+<div id="editProfileModal" class="hidden fixed inset-0 z-50 modal-overlay flex items-center justify-center p-4">
+  <div class="w-full max-w-sm bg-[#0a0a0a] rounded-2xl animate-fade border border-white/10 p-6">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="text-lg font-bold">Editar perfil</h3>
+      <button onclick="closeModal('editProfileModal')" class="text-gray-400"><i class="fas fa-times"></i></button>
+    </div>
+    <form onsubmit="handleEditProfile(event)">
+      <div class="mb-4">
+        <label class="block text-xs text-gray-400 mb-2">Nome completo</label>
+        <input type="text" id="editName" required class="app-input">
+      </div>
+      <div class="mb-4">
+        <label class="block text-xs text-gray-400 mb-2">Telefone</label>
+        <input type="tel" id="editPhone" required class="app-input">
+      </div>
+      <button type="submit" class="btn-primary w-full text-black font-bold py-3 rounded-xl">Salvar</button>
+    </form>
+  </div>
+</div>
+
+<div id="changePassModal" class="hidden fixed inset-0 z-50 modal-overlay flex items-center justify-center p-4">
+  <div class="w-full max-w-sm bg-[#0a0a0a] rounded-2xl animate-fade border border-white/10 p-6">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="text-lg font-bold">Alterar senha</h3>
+      <button onclick="closeModal('changePassModal')" class="text-gray-400"><i class="fas fa-times"></i></button>
+    </div>
+    <form onsubmit="handleChangePass(event)">
+      <div class="mb-4">
+        <label class="block text-xs text-gray-400 mb-2">Senha atual</label>
+        <input type="password" id="curPass" required class="app-input">
+      </div>
+      <div class="mb-4">
+        <label class="block text-xs text-gray-400 mb-2">Nova senha</label>
+        <input type="password" id="newPass" required minlength="6" class="app-input">
+      </div>
+      <div class="mb-4">
+        <label class="block text-xs text-gray-400 mb-2">Confirmar nova senha</label>
+        <input type="password" id="newPassConfirm" required class="app-input">
+      </div>
+      <button type="submit" class="btn-primary w-full text-black font-bold py-3 rounded-xl">Atualizar senha</button>
+    </form>
+  </div>
+</div>
+
+<div id="toastContainer"></div>
+
+</div>
+
+<script>
+// AUTH SYSTEM
+const SALT = 'truckinvest_2026_secure_salt';
+let currentUser = null;
+let currentOtp = null;
+let otpAction = null;
+
+async function hashPassword(password) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password + SALT);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function generateOtp() { return Math.floor(100000 + Math.random() * 900000).toString(); }
+
+function getUsers() { return JSON.parse(localStorage.getItem('ti_users') || '[]'); }
+function saveUsers(users) { localStorage.setItem('ti_users', JSON.stringify(users)); }
+function getInvestments() { return JSON.parse(localStorage.getItem('ti_investments') || '[]'); }
+function saveInvestments(inv) { localStorage.setItem('ti_investments', JSON.stringify(inv)); }
+function getDeposits() { return JSON.parse(localStorage.getItem('ti_deposits') || '[]'); }
+function saveDeposits(dep) { localStorage.setItem('ti_deposits', JSON.stringify(dep)); }
+function getWithdraws() { return JSON.parse(localStorage.getItem('ti_withdraws') || '[]'); }
+function saveWithdraws(wd) { localStorage.setItem('ti_withdraws', JSON.stringify(wd)); }
+
+function initAdmin() {
+  const users = getUsers();
+  if (!users.find(u => u.phone === '840000000')) {
+    hashPassword('admin123').then(hash => {
+      users.push({
+        id: 1, name: 'Administrador', phone: '840000000',
+        passwordHash: hash, type: 'admin', balance: 50000,
+        createdAt: '2025-04-14'
+      });
+      saveUsers(users);
+    });
+  }
+}
+
+function checkSession() {
+  const savedId = localStorage.getItem('ti_currentUserId');
+  if (savedId) {
+    const users = getUsers();
+    const user = users.find(u => u.id === parseInt(savedId));
+    if (user) {
+      currentUser = user;
+      showApp();
+      return;
+    }
+  }
+  showLanding();
+}
+
+function showLanding() {
+  document.getElementById('landingPage').classList.remove('hidden');
+  document.getElementById('mainApp').classList.add('hidden');
+  document.getElementById('plansPage').classList.add('hidden');
+  document.getElementById('depositPage').classList.add('hidden');
+  document.getElementById('withdrawPage').classList.add('hidden');
+  document.getElementById('adminPage').classList.add('hidden');
+}
+
+function showApp() {
+  document.getElementById('landingPage').classList.add('hidden');
+  document.getElementById('mainApp').classList.remove('hidden');
+  document.getElementById('plansPage').classList.add('hidden');
+  document.getElementById('depositPage').classList.add('hidden');
+  document.getElementById('withdrawPage').classList.add('hidden');
+  document.getElementById('adminPage').classList.add('hidden');
+  renderApp();
+}
+
+function showSection(section) {
+  if (!currentUser && section !== 'landing') {
+    openAuthModal();
+    return;
+  }
+  document.getElementById('landingPage').classList.add('hidden');
+  document.getElementById('mainApp').classList.add('hidden');
+  document.getElementById('plansPage').classList.add('hidden');
+  document.getElementById('depositPage').classList.add('hidden');
+  document.getElementById('withdrawPage').classList.add('hidden');
+  document.getElementById('adminPage').classList.add('hidden');
+  
+  if (section === 'home' || section === 'profile') {
+    showApp();
+  } else if (section === 'plans') {
+    document.getElementById('plansPage').classList.remove('hidden');
+    renderPlans();
+  } else if (section === 'deposit') {
+    document.getElementById('depositPage').classList.remove('hidden');
+    document.getElementById('depBalance').textContent = 'MZN ' + currentUser.balance.toFixed(2);
+  } else if (section === 'withdraw') {
+    document.getElementById('withdrawPage').classList.remove('hidden');
+    document.getElementById('wdBalance').textContent = 'MZN ' + currentUser.balance.toFixed(2);
+  } else if (section === 'admin') {
+    if (currentUser.type !== 'admin') {
+      showToast('Acesso restrito!', 'error');
+      showApp();
+      return;
+    }
+    document.getElementById('adminPage').classList.remove('hidden');
+    renderAdmin();
+  }
+  window.scrollTo(0, 0);
+}
+
+function openAuthModal() {
+  document.getElementById('authModal').classList.remove('hidden');
+  switchAuthTab('login');
+}
+function closeAuthModal() { document.getElementById('authModal').classList.add('hidden'); }
+
+function switchAuthTab(tab) {
+  const loginTab = document.getElementById('tabLogin');
+  const registerTab = document.getElementById('tabRegister');
+  const loginForm = document.getElementById('loginForm');
+  const registerForm = document.getElementById('registerForm');
+  
+  if (tab === 'login') {
+    loginTab.classList.add('bg-amber-500', 'text-black');
+    loginTab.classList.remove('text-gray-400');
+    registerTab.classList.remove('bg-amber-500', 'text-black');
+    registerTab.classList.add('text-gray-400');
+    loginForm.classList.remove('hidden');
+    registerForm.classList.add('hidden');
+  } else {
+    registerTab.classList.add('bg-amber-500', 'text-black');
+    registerTab.classList.remove('text-gray-400');
+    loginTab.classList.remove('bg-amber-500', 'text-black');
+    loginTab.classList.add('text-gray-400');
+    registerForm.classList.remove('hidden');
+    loginForm.classList.add('hidden');
+  }
+}
+
+async function handleLogin(e) {
+  e.preventDefault();
+  const phone = document.getElementById('loginPhone').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const errorDiv = document.getElementById('loginError');
+  errorDiv.classList.add('hidden');
+  
+  const users = getUsers();
+  const user = users.find(u => u.phone === phone);
+  
+  if (!user) {
+    errorDiv.textContent = 'Telefone não cadastrado';
+    errorDiv.classList.remove('hidden');
+    return;
+  }
+  
+  const hash = await hashPassword(password);
+  if (hash !== user.passwordHash) {
+    errorDiv.textContent = 'Senha incorreta';
+    errorDiv.classList.remove('hidden');
+    return;
+  }
+  
+  currentUser = user;
+  localStorage.setItem('ti_currentUserId', user.id.toString());
+  closeAuthModal();
+  document.getElementById('loginForm').reset();
+  showApp();
+  showToast('Bem-vindo, ' + user.name + '!', 'success');
+}
+
+async function handleRegister(e) {
+  e.preventDefault();
+  const name = document.getElementById('regName').value.trim();
+  const phone = document.getElementById('regPhone').value.trim();
+  const password = document.getElementById('regPassword').value;
+  const passwordConfirm = document.getElementById('regPasswordConfirm').value;
+  const acceptTerms = document.getElementById('acceptTerms').checked;
+  const errorDiv = document.getElementById('registerError');
+  errorDiv.classList.add('hidden');
+  
+  if (name.length < 3) { errorDiv.textContent = 'Nome deve ter no mínimo 3 caracteres'; errorDiv.classList.remove('hidden'); return; }
+  if (!/^[0-9]{9,12}$/.test(phone)) { errorDiv.textContent = 'Telefone inválido'; errorDiv.classList.remove('hidden'); return; }
+  if (password.length < 6) { errorDiv.textContent = 'Senha deve ter no mínimo 6 caracteres'; errorDiv.classList.remove('hidden'); return; }
+  if (password !== passwordConfirm) { errorDiv.textContent = 'As senhas não coincidem'; errorDiv.classList.remove('hidden'); return; }
+  if (!acceptTerms) { errorDiv.textContent = 'Aceite os termos'; errorDiv.classList.remove('hidden'); return; }
+  
+  const users = getUsers();
+  if (users.find(u => u.phone === phone)) {
+    errorDiv.textContent = 'Telefone já cadastrado';
+    errorDiv.classList.remove('hidden');
+    return;
+  }
+  
+  const hash = await hashPassword(password);
+  const newUser = {
+    id: Date.now(), name, phone, passwordHash: hash,
+    type: 'user', balance: 0,
+    createdAt: new Date().toISOString().split('T')[0]
+  };
+  users.push(newUser);
+  saveUsers(users);
+  
+  currentUser = newUser;
+  localStorage.setItem('ti_currentUserId', newUser.id.toString());
+  closeAuthModal();
+  document.getElementById('registerForm').reset();
+  showApp();
+  showToast('Conta criada com sucesso!', 'success');
+}
+
+function logout() {
+  if (!confirm('Deseja realmente sair?')) return;
+  currentUser = null;
+  localStorage.removeItem('ti_currentUserId');
+  showLanding();
+  showToast('Sessão encerrada', 'success');
+}
+
+function showForgot() {
+  closeAuthModal();
+  openModal('forgotModal');
+}
+
+function handleForgot(e) {
+  e.preventDefault();
+  const phone = document.getElementById('forgotPhone').value.trim();
+  const users = getUsers();
+  const user = users.find(u => u.phone === phone);
+  if (!user) { showToast('Telefone não cadastrado', 'error'); return; }
+  
+  currentOtp = generateOtp();
+  otpAction = 'reset';
+  closeModal('forgotModal');
+  document.querySelectorAll('.otp-input').forEach(i => i.value = '');
+  openModal('otpModal');
+  setTimeout(() => {
+    showToast('Código: ' + currentOtp, 'success');
+    document.querySelectorAll('.otp-input')[0].focus();
+  }, 500);
+}
+
+function otpNext(input, index) {
+  if (input.value.length === 1) {
+    const inputs = document.querySelectorAll('.otp-input');
+    if (inputs[index + 1]) inputs[index + 1].focus();
+  }
+}
+function otpBack(event, input, index) {
+  if (event.key === 'Backspace' && input.value === '') {
+    const inputs = document.querySelectorAll('.otp-input');
+    if (index > 0) inputs[index - 1].focus();
+  }
+}
+
+function verifyOtp() {
+  const code = Array.from(document.querySelectorAll('.otp-input')).map(i => i.value).join('');
+  if (code.length !== 6) { showToast('Digite o código completo', 'error'); return; }
+  if (code !== currentOtp) {
+    document.getElementById('otpError').classList.remove('hidden');
+    document.querySelectorAll('.otp-input').forEach(i => { i.value = ''; i.classList.add('shake'); });
+    setTimeout(() => document.querySelectorAll('.otp-input').forEach(i => i.classList.remove('shake')), 400);
+    document.querySelectorAll('.otp-input')[0].focus();
+    return;
+  }
+  closeModal('otpModal');
+  if (otpAction === 'reset') {
+    openModal('changePassModal');
+  }
+}
+
+function resendOtp() {
+  currentOtp = generateOtp();
+  showToast('Novo código: ' + currentOtp, 'success');
+}
+
+async function handleChangePass(e) {
+  e.preventDefault();
+  const curPass = document.getElementById('curPass').value;
+  const newPass = document.getElementById('newPass').value;
+  const newPassConfirm = document.getElementById('newPassConfirm').value;
+  
+  if (newPass.length < 6) { showToast('Senha deve ter no mínimo 6 caracteres', 'error'); return; }
+  if (newPass !== newPassConfirm) { showToast('As senhas não coincidem', 'error'); return; }
+  
+  if (otpAction !== 'reset') {
+    const curHash = await hashPassword(curPass);
+    if (curHash !== currentUser.passwordHash) { showToast('Senha atual incorreta', 'error'); return; }
+  }
+  
+  currentUser.passwordHash = await hashPassword(newPass);
+  const users = getUsers();
+  const idx = users.findIndex(u => u.id === currentUser.id);
+  if (idx >= 0) { users[idx] = currentUser; saveUsers(users); }
+  
+  closeModal('changePassModal');
+  document.getElementById('curPass').value = '';
+  document.getElementById('newPass').value = '';
+  document.getElementById('newPassConfirm').value = '';
+  showToast('Senha atualizada!', 'success');
+  currentOtp = null; otpAction = null;
+}
+
+// APP RENDERING
+function renderApp() {
+  if (!currentUser) return;
+  
+  const users = getUsers();
+  const freshUser = users.find(u => u.id === currentUser.id);
+  if (freshUser) currentUser = freshUser;
+  
+  document.getElementById('appUserId').textContent = currentUser.id.toString().padStart(10, '0');
+  document.getElementById('appUserName').textContent = currentUser.name;
+  document.getElementById('appBalance').textContent = 'MZN ' + currentUser.balance.toFixed(2);
+  
+  const investments = getInvestments().filter(i => i.userId === currentUser.id);
+  const totalYield = investments.reduce((sum, inv) => {
+    const start = new Date(inv.startDate);
+    const end = new Date(inv.endDate);
+    const now = new Date();
+    const total = end - start;
+    const elapsed = Math.min(now - start, total);
+    const progress = elapsed / total;
+    return sum + (inv.estimatedValue - inv.value) * progress;
+  }, 0);
+  document.getElementById('appYield').textContent = 'MZN ' + totalYield.toFixed(2);
+  
+  document.getElementById('infoName').textContent = currentUser.name;
+  document.getElementById('infoId').textContent = currentUser.id.toString().padStart(10, '0');
+  document.getElementById('infoType').textContent = currentUser.type === 'admin' ? 'Administrador' : 'Cliente';
+  document.getElementById('infoDate').textContent = currentUser.createdAt ? new Date(currentUser.createdAt).toLocaleDateString('pt-BR') : '-';
+  document.getElementById('walletBalance').textContent = 'MZN ' + currentUser.balance.toFixed(2);
+  document.getElementById('refLink').textContent = 'truckinvest.co.mz/ref/' + currentUser.id.toString().padStart(10, '0');
+  
+  renderInvestments(investments);
+  renderAssets(investments);
+  renderWalletTx();
+  
+  switchMainTab('account');
+}
+
+function renderInvestments(investments) {
+  const list = document.getElementById('investmentsList');
+  const noInv = document.getElementById('noInvestments');
+  
+  if (investments.length === 0) {
+    list.innerHTML = '';
+    noInv.classList.remove('hidden');
+    return;
+  }
+  noInv.classList.add('hidden');
+  
+  list.innerHTML = investments.map(inv => {
+    const start = new Date(inv.startDate);
+    const end = new Date(inv.endDate);
+    const now = new Date();
+    const total = end - start;
+    const elapsed = Math.max(0, now - start);
+    const daysElapsed = Math.floor(elapsed / 86400000);
+    const daysRemaining = Math.max(0, inv.duration - daysElapsed);
+    const progress = Math.min(100, Math.max(0, (elapsed / total) * 100));
+    const statusClass = inv.status === 'active' ? 'badge-active' : inv.status === 'completed' ? 'badge-completed' : 'badge-pending';
+    const statusLabel = inv.status === 'active' ? 'Ativo' : inv.status === 'completed' ? 'Concluído' : 'Pendente';
+    
+    return `
+    <div class="app-card rounded-xl p-4 flex gap-3">
+      <div class="w-16 h-16 rounded-lg bg-gradient-to-br from-amber-500/20 to-amber-700/20 border border-amber-500/30 flex items-center justify-center flex-shrink-0">
+        <i class="fas fa-truck text-amber-500 text-xl"></i>
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-2 mb-1">
+          <h4 class="font-bold text-sm truncate">${inv.planName}</h4>
+          <span class="text-[10px] px-2 py-0.5 rounded-full ${statusClass}">${statusLabel}</span>
+        </div>
+        <div class="text-[10px] text-gray-400 mb-0.5">Investimento: MZN ${inv.value.toFixed(2)}</div>
+        <div class="text-[10px] text-gray-400">Rendimento diário: MZN ${inv.dailyReturn.toFixed(2)}</div>
+      </div>
+      <div class="text-right flex-shrink-0">
+        <div class="text-[10px] text-gray-400">Dias restantes</div>
+        <div class="text-base font-bold text-amber-500">${daysRemaining}/${inv.duration}</div>
+        <div class="progress-track w-20 mt-1">
+          <div class="progress-fill" style="width: ${progress}%"></div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderAssets(investments) {
+  const list = document.getElementById('assetsList');
+  const noAssets = document.getElementById('noAssets');
+  
+  if (investments.length === 0) {
+    list.innerHTML = '';
+    noAssets.classList.remove('hidden');
+    return;
+  }
+  noAssets.classList.add('hidden');
+  list.innerHTML = investments.map(inv => `
+    <div class="app-card rounded-xl p-4 flex items-center justify-between">
+      <div>
+        <div class="text-sm font-bold">${inv.planName}</div>
+        <div class="text-[10px] text-gray-400">MZN ${inv.value.toFixed(2)}</div>
+      </div>
+      <span class="text-[10px] px-2 py-1 rounded-full badge-active">Ativo</span>
+    </div>
+  `).join('');
+}
+
+function renderWalletTx() {
+  const deposits = getDeposits().filter(d => d.userId === currentUser.id);
+  const withdraws = getWithdraws().filter(w => w.userId === currentUser.id);
+  const allTx = [
+    ...deposits.map(d => ({...d, type: 'deposit'})),
+    ...withdraws.map(w => ({...w, type: 'withdraw'}))
+  ].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+  
+  const container = document.getElementById('walletTx');
+  const noTx = document.getElementById('noWalletTx');
+  
+  if (allTx.length === 0) {
+    container.innerHTML = '';
+    noTx.classList.remove('hidden');
+    return;
+  }
+  noTx.classList.add('hidden');
+  container.innerHTML = allTx.map(tx => `
+    <div class="flex items-center justify-between py-2 border-b border-white/5 last:border-0">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg ${tx.type === 'deposit' ? 'bg-green-500/20' : 'bg-red-500/20'} flex items-center justify-center">
+          <i class="fas ${tx.type === 'deposit' ? 'fa-arrow-down text-green-400' : 'fa-arrow-up text-red-400'} text-xs"></i>
+        </div>
+        <div>
+          <div class="text-xs font-medium">${tx.type === 'deposit' ? 'Depósito' : 'Levantamento'}</div>
+          <div class="text-[10px] text-gray-500">${new Date(tx.date).toLocaleDateString('pt-BR')}</div>
+        </div>
+      </div>
+      <div class="text-xs font-bold ${tx.type === 'deposit' ? 'text-green-400' : 'text-red-400'}">
+        ${tx.type === 'deposit' ? '+' : '-'}MZN ${tx.value.toFixed(2)}
+      </div>
+    </div>
+  `).join('');
+}
+
+// PLANS
+const PLANS = [
+  { id: 1, name: 'Inicial', value: 200, daily: 30, duration: 30, total: 1100, icon: 'fa-seedling', color: 'from-green-500 to-green-700' },
+  { id: 2, name: 'Bronze', value: 500, daily: 75, duration: 30, total: 2750, icon: 'fa-medal', color: 'from-amber-700 to-amber-900' },
+  { id: 3, name: 'Prata', value: 1000, daily: 150, duration: 30, total: 5500, icon: 'fa-award', color: 'from-gray-400 to-gray-600' },
+  { id: 4, name: 'Ouro', value: 2000, daily: 300, duration: 30, total: 11000, icon: 'fa-crown', color: 'from-yellow-500 to-yellow-700' },
+  { id: 5, name: 'Premium', value: 3000, daily: 450, duration: 30, total: 16500, icon: 'fa-gem', color: 'from-purple-500 to-purple-700' }
+];
+
+function renderPlans() {
+  document.getElementById('plansList').innerHTML = PLANS.map(p => `
+    <div class="app-card rounded-2xl p-5">
+      <div class="flex items-start gap-3 mb-4">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br ${p.color} flex items-center justify-center flex-shrink-0">
+          <i class="fas ${p.icon} text-white text-lg"></i>
+        </div>
+        <div class="flex-1">
+          <h3 class="font-bold text-base">${p.name}</h3>
+          <div class="text-xl font-bold text-amber-500">MZN ${p.value.toLocaleString()}</div>
+        </div>
+      </div>
+      <div class="space-y-2 mb-4">
+        <div class="flex justify-between text-xs p-2.5 bg-white/5 rounded-lg">
+          <span class="text-gray-400">Rendimento diário</span>
+          <span class="font-semibold">MZN ${p.daily}</span>
+        </div>
+        <div class="flex justify-between text-xs p-2.5 bg-white/5 rounded-lg">
+          <span class="text-gray-400">Prazo</span>
+          <span>${p.duration} dias</span>
+        </div>
+        <div class="flex justify-between text-xs p-2.5 bg-white/5 rounded-lg">
+          <span class="text-gray-400">Rendimento em 30 dias</span>
+          <span class="text-amber-400">MZN ${(p.daily * 30).toLocaleString()}</span>
+        </div>
+        <div class="flex justify-between text-xs p-2.5 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+          <span class="text-gray-300">Total estimado</span>
+          <span class="font-bold text-amber-500">MZN ${p.total.toLocaleString()}</span>
+        </div>
+      </div>
+      <button onclick="openInvestModal(${p.id})" class="btn-primary w-full text-black font-bold py-3 rounded-xl text-sm">Investir agora</button>
+    </div>
+  `).join('');
+}
+
+function openInvestModal(planId) {
+  const plan = PLANS.find(p => p.id === planId);
+  document.getElementById('investContent').innerHTML = `
+    <div class="text-center mb-5">
+      <div class="w-16 h-16 rounded-xl bg-gradient-to-br ${plan.color} flex items-center justify-center mx-auto mb-3">
+        <i class="fas ${plan.icon} text-white text-2xl"></i>
+      </div>
+      <h4 class="text-xl font-bold">${plan.name}</h4>
+    </div>
+    <div class="space-y-2 text-xs mb-5">
+      <div class="flex justify-between p-3 bg-white/5 rounded-lg"><span class="text-gray-400">Valor investido</span><span class="font-bold">MZN ${plan.value.toLocaleString()}</span></div>
+      <div class="flex justify-between p-3 bg-white/5 rounded-lg"><span class="text-gray-400">Rendimento diário</span><span class="font-bold">MZN ${plan.daily}</span></div>
+      <div class="flex justify-between p-3 bg-white/5 rounded-lg"><span class="text-gray-400">Duração</span><span>${plan.duration} dias</span></div>
+      <div class="flex justify-between p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg"><span class="text-gray-300">Total estimado</span><span class="font-bold text-amber-500">MZN ${plan.total.toLocaleString()}</span></div>
+    </div>
+    <div class="grid grid-cols-2 gap-3">
+      <button onclick="closeModal('investModal')" class="bg-white/5 border border-white/20 py-3 rounded-xl text-xs font-bold">Cancelar</button>
+      <button onclick="confirmInvest(${plan.id})" class="btn-primary text-black py-3 rounded-xl text-xs font-bold">Confirmar</button>
+    </div>
+  `;
+  openModal('investModal');
+}
+
+function confirmInvest(planId) {
+  const plan = PLANS.find(p => p.id === planId);
+  if (currentUser.balance < plan.value) {
+    showToast('Saldo insuficiente. Faça um depósito.', 'error');
+    closeModal('investModal');
+    return;
+  }
+  
+  currentUser.balance -= plan.value;
+  const users = getUsers();
+  const idx = users.findIndex(u => u.id === currentUser.id);
+  if (idx >= 0) { users[idx] = currentUser; saveUsers(users); }
+  
+  const inv = {
+    id: Date.now(), userId: currentUser.id, userName: currentUser.name,
+    planId: plan.id, planName: plan.name, value: plan.value,
+    dailyReturn: plan.daily, duration: plan.duration,
+    startDate: new Date().toISOString(),
+    endDate: new Date(Date.now() + plan.duration * 86400000).toISOString(),
+    estimatedValue: plan.total, status: 'active'
+  };
+  const investments = getInvestments();
+  investments.push(inv);
+  saveInvestments(investments);
+  
+  closeModal('investModal');
+  showToast('Investimento realizado!', 'success');
+  showSection('home');
+}
+
+// DEPOSIT/WITHDRAW
+function handleDeposit(e) {
+  e.preventDefault();
+  const amount = parseFloat(document.getElementById('depAmount').value);
+  const method = document.getElementById('depMethod').value;
+  const message = document.getElementById('depMessage').value;
+  
+  const deposits = getDeposits();
+  deposits.push({
+    id: Date.now(),
+    userId: currentUser.id,
+    userName: currentUser.name,
+    userPhone: currentUser.phone,
+    value: amount,
+    method,
+    message,
+    date: new Date().toISOString(),
+    status: 'pending'
+  });
+  saveDeposits(deposits);
+  
+  e.target.reset();
+  showToast('Depósito enviado para aprovação!', 'success');
+  showSection('home');
+}
+
+function handleWithdraw(e) {
+  e.preventDefault();
+  const amount = parseFloat(document.getElementById('wdAmount').value);
+  const method = document.getElementById('wdMethod').value;
+  const account = document.getElementById('wdAccount').value;
+  const name = document.getElementById('wdName').value;
+  
+  if (amount < 100) { showToast('O valor mínimo para levantamento é 100 MT', 'error'); return; }
+  if (amount > currentUser.balance) { showToast('Saldo insuficiente', 'error'); return; }
+  
+  currentUser.balance -= amount;
+  const users = getUsers();
+  const idx = users.findIndex(u => u.id === currentUser.id);
+  if (idx >= 0) { users[idx] = currentUser; saveUsers(users); }
+  
+  const withdraws = getWithdraws();
+  withdraws.push({
+    id: Date.now(), userId: currentUser.id, userName: currentUser.name,
+    value: amount, method, account, name, date: new Date().toISOString(), status: 'pending'
+  });
+  saveWithdraws(withdraws);
+  e.target.reset();
+  document.getElementById('wdBalance').textContent = 'MZN ' + currentUser.balance.toFixed(2);
+  showToast('Levantamento solicitado.', 'success');
+}
+
+function handleEditProfile(e) {
+  e.preventDefault();
+  currentUser.name = document.getElementById('editName').value.trim();
+  currentUser.phone = document.getElementById('editPhone').value.trim();
+  const users = getUsers();
+  const idx = users.findIndex(u => u.id === currentUser.id);
+  if (idx >= 0) { users[idx] = currentUser; saveUsers(users); }
+  closeModal('editProfileModal');
+  showToast('Perfil atualizado!', 'success');
+  renderApp();
+}
+
+// TABS
+function switchMainTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+  document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.remove('hidden');
+  document.querySelectorAll('.nav-tab').forEach(b => { b.classList.remove('active'); b.classList.add('text-gray-400'); });
+  const tabs = document.querySelectorAll('.nav-tab');
+  const idx = ['home','assets','share','account'].indexOf(tab);
+  if (idx >= 0) { tabs[idx].classList.add('active'); tabs[idx].classList.remove('text-gray-400'); }
+  
+  document.querySelectorAll('.bottom-nav-item').forEach(b => { b.classList.remove('active'); b.classList.add('text-gray-500'); });
+  const bottomBtns = document.querySelectorAll('.bottom-nav-item');
+  if (idx >= 0) { bottomBtns[idx].classList.add('active'); bottomBtns[idx].classList.remove('text-gray-500'); }
+}
+
+function switchSubTab(tab) {
+  document.querySelectorAll('.sub-content').forEach(c => c.classList.add('hidden'));
+  document.getElementById('sub' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.remove('hidden');
+  document.querySelectorAll('.sub-tab').forEach(b => b.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+}
+
+function switchAdminTab(tab) {
+  document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.add('hidden'));
+  document.getElementById('admin' + tab.charAt(0).toUpperCase() + tab.slice(1) + 'Tab').classList.remove('hidden');
+  document.querySelectorAll('.admin-tab-btn').forEach(b => {
+    b.classList.remove('active', 'bg-amber-500', 'text-black');
+    b.classList.add('bg-white/5', 'text-gray-400');
+  });
+  event.currentTarget.classList.remove('bg-white/5', 'text-gray-400');
+  event.currentTarget.classList.add('active', 'bg-amber-500', 'text-black');
+}
+
+// ADMIN
+function renderAdmin() {
+  const users = getUsers();
+  const deposits = getDeposits();
+  const withdraws = getWithdraws();
+  
+  document.getElementById('adminTotalUsers').textContent = users.length;
+  document.getElementById('adminPendingDeposits').textContent = deposits.filter(d => d.status === 'pending').length;
+  
+  const pendingDeposits = deposits.filter(d => d.status === 'pending');
+  const depList = document.getElementById('adminDepositsList');
+  const noDep = document.getElementById('noAdminDeposits');
+  
+  if (pendingDeposits.length === 0) {
+    depList.innerHTML = '';
+    noDep.classList.remove('hidden');
+  } else {
+    noDep.classList.add('hidden');
+    depList.innerHTML = pendingDeposits.map(dep => `
+      <div class="app-card p-4">
+        <div class="flex items-start justify-between mb-3">
+          <div>
+            <div class="text-sm font-bold">${dep.userName}</div>
+            <div class="text-[10px] text-gray-400">${dep.userPhone || 'N/A'}</div>
+          </div>
+          <div class="text-lg font-bold text-amber-500">MZN ${dep.value.toFixed(2)}</div>
+        </div>
+        <div class="bg-black/30 rounded-lg p-3 mb-3">
+          <div class="text-[10px] text-gray-400 mb-1">Mensagem M-Pesa:</div>
+          <div class="text-xs text-white whitespace-pre-wrap font-mono">${dep.message || 'Sem mensagem'}</div>
+        </div>
+        <div class="text-[10px] text-gray-500 mb-3">${new Date(dep.date).toLocaleString('pt-BR')}</div>
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="approveDeposit(${dep.id})" class="bg-green-500/20 border border-green-500/50 text-green-400 py-2 rounded-lg text-xs font-bold">
+            <i class="fas fa-check mr-1"></i>Aprovar
+          </button>
+          <button onclick="rejectDeposit(${dep.id})" class="bg-red-500/20 border border-red-500/50 text-red-400 py-2 rounded-lg text-xs font-bold">
+            <i class="fas fa-times mr-1"></i>Rejeitar
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+  
+  document.getElementById('adminUsersList').innerHTML = users.map(u => `
+    <div class="app-card p-3 flex items-center justify-between">
+      <div>
+        <div class="text-sm font-bold">${u.name}</div>
+        <div class="text-[10px] text-gray-400">${u.phone} · ${u.type === 'admin' ? 'ADMIN' : 'Cliente'}</div>
+      </div>
+      <div class="text-sm font-bold text-amber-500">MZN ${u.balance.toFixed(2)}</div>
+    </div>
+  `).join('');
+}
+
+function approveDeposit(depositId) {
+  const deposits = getDeposits();
+  const deposit = deposits.find(d => d.id === depositId);
+  if (!deposit) return;
+  
+  const users = getUsers();
+  const user = users.find(u => u.id === deposit.userId);
+  if (user) {
+    user.balance += deposit.value;
+    const userIdx = users.findIndex(u => u.id === user.id);
+    users[userIdx] = user;
+    saveUsers(users);
+  }
+  
+  deposit.status = 'approved';
+  saveDeposits(deposits);
+  
+  renderAdmin();
+  showToast('Depósito aprovado!', 'success');
+}
+
+function rejectDeposit(depositId) {
+  const deposits = getDeposits();
+  const deposit = deposits.find(d => d.id === depositId);
+  if (deposit) {
+    deposit.status = 'rejected';
+    saveDeposits(deposits);
+    renderAdmin();
+    showToast('Depósito rejeitado', 'error');
+  }
+}
+
+// HELPERS
+function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+function togglePass(fieldId, btn) {
+  const field = document.getElementById(fieldId);
+  const icon = btn.querySelector('i');
+  if (field.type === 'password') { field.type = 'text'; icon.className = 'fas fa-eye-slash text-sm'; }
+  else { field.type = 'password'; icon.className = 'fas fa-eye text-sm'; }
+}
+
+function copyRef() {
+  const link = document.getElementById('refLink').textContent;
+  navigator.clipboard.writeText(link).then(() => showToast('Link copiado!', 'success'));
+}
+
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('Número copiado: ' + text, 'success');
+  }).catch(() => {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textArea);
+    showToast('Número copiado: ' + text, 'success');
+  });
+}
+
+function showToast(msg, type = 'success') {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2"></i>${msg}`;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+// INIT
+initAdmin();
+checkSession();
+</script>
+</body>
+</html>
